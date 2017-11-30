@@ -1,6 +1,6 @@
 ---
-title: "Tarea 1 - Métodos avanzados en minería de datos"
-author: "Pablo Acuña Quirós"
+title: "Tarea 1 - MÃ©todos avanzados en minerÃ­a de datos"
+author: "Pablo AcuÃ±a QuirÃ³s"
 date: "31/05/2017"
 output: html_document
 ---
@@ -19,7 +19,7 @@ library(cluster)
 ```
 
 ###**Ejercicio 1**
-####ACP e interpretación
+####ACP e interpretaciÃ³n
 a) Individuos y variables mal representados
 ```{r 1.a, echo=T, cache=FALSE, fig.align='center'}
 setwd("C:/Users/paacun/Google Drive/Promidat/Metodos_Avanzados_en Mineria_de_Datos_Legrende/Tarea1")
@@ -43,37 +43,37 @@ plot(pca,
      select="cos2 0.1")
 ```
 
-b) Clústeres en el plano principal
-  Se logran identificar visualmente al menos cuatro clústeres:
-  * Portugal, España y Noruega
+b) ClÃºsteres en el plano principal
+  Se logran identificar visualmente al menos cuatro clÃºsteres:
+  * Portugal, EspaÃ±a y Noruega
   * Yugoslavia, Rumania, Bulagria y Albania
-  * Grecia, Italia, HUngría y URSS
-  * El resto de países
+  * Grecia, Italia, HUngrÃ­a y URSS
+  * El resto de paÃ­ses
 
-c) Correlación entre variables
+c) CorrelaciÃ³n entre variables
   
-  De acuerdo al círculo de correlación se puede concluir que el consumo de carnes (RUMI, AVES),   huevos (HUEV) y leche (LECH) tiene una alta correlación. Es decir, cuando se consume uno se     consumen también los otros. Los cereales (CERE) y las semillas (LEGU) también tienen alguna     correlación. Donde se consumen cereales (CERE) no se consumen comidas almidonadas   (ALMI) y    donde se consumen huevos (HUEV) no se consumen semillas (LEGU).
+  De acuerdo al cÃ­rculo de correlaciÃ³n se puede concluir que el consumo de carnes (RUMI, AVES),   huevos (HUEV) y leche (LECH) tiene una alta correlaciÃ³n. Es decir, cuando se consume uno se     consumen tambiÃ©n los otros. Los cereales (CERE) y las semillas (LEGU) tambiÃ©n tienen alguna     correlaciÃ³n. Donde se consumen cereales (CERE) no se consumen comidas almidonadas   (ALMI) y    donde se consumen huevos (HUEV) no se consumen semillas (LEGU).
 
-d) Formación de clústeres
+d) FormaciÃ³n de clÃºsteres
 ```{r 1.d, echo=T, cache=FALSE, fig.align='center'}
 modelo <- prcomp(Datos,scale. = TRUE,center = TRUE)
 modelo
 biplot(modelo)
 ```
-Se puede observar que países como Portugal, España y Noruega eran consumidores de frutas, verduras y carne de pescado como principal fuente de proteína. Alemania, Dinamarca, Polonia, Francia eran consumidores principalmente de comidas almidonadas. Finlandia, Suiza, Holanda, Austria, etc consumían carnes, huevos y leche; en otras palabras países ganaderos principalmente. Grecia e Italia consumían semillas. Yogoslavia, Albania, Bulgaria, etc grandes consumidores de cereales.
+Se puede observar que paÃ­ses como Portugal, EspaÃ±a y Noruega eran consumidores de frutas, verduras y carne de pescado como principal fuente de proteÃ­na. Alemania, Dinamarca, Polonia, Francia eran consumidores principalmente de comidas almidonadas. Finlandia, Suiza, Holanda, Austria, etc consumÃ­an carnes, huevos y leche; en otras palabras paÃ­ses ganaderos principalmente. Grecia e Italia consumÃ­an semillas. Yogoslavia, Albania, Bulgaria, etc grandes consumidores de cereales.
 
 
 
 ####Funciones Fviz del paquete Factoextra
 ```{r Fviz, echo=T, cache=FALSE, fig.align='center'}
-# Gráfico de individuos
+# GrÃ¡fico de individuos
 fviz_pca_ind(pca,axes = c(1, 2), geom = c("point", "text"),
        label = "all", invisible = "none", labelsize = 4,
        pointsize = 2, habillage = "none",
        addEllipses = FALSE, ellipse.level = 1, 
        col.ind = "red", col.ind.sup = "blue", alpha.ind = 1,
        select.ind = list(name = NULL, cos2 = 0.1, contrib = NULL))
-# Gráfico de variables
+# GrÃ¡fico de variables
 fviz_pca_var(pca, axes = c(1, 2), geom = c("arrow", "text"),
        label = "all", invisible = "none", labelsize = 4,
        col.var = "blue", alpha.var = 1, col.quanti.sup = "blue",
@@ -93,7 +93,7 @@ fviz_pca_biplot(pca, axes = c(1, 2), geom = c("point", "text"),
 
 
 ####Plano Principal y mapa de Europa
-Se puede observar que si el plano principal se rota 90 grados en contra de las manecillas del reloj, se asemeja a la ubicación geográfica de los países en el mapa mundial. Esto también concuerda en cómo se agrupan los países según el consumo de proteínas.
+Se puede observar que si el plano principal se rota 90 grados en contra de las manecillas del reloj, se asemeja a la ubicaciÃ³n geogrÃ¡fica de los paÃ­ses en el mapa mundial. Esto tambiÃ©n concuerda en cÃ³mo se agrupan los paÃ­ses segÃºn el consumo de proteÃ­nas.
 
 
 
@@ -144,7 +144,7 @@ fviz_pca_var(pca.2, axes = c(1, 2), geom = c("arrow", "text"),
        col.var = "blue", alpha.var = 1, col.quanti.sup = "blue",
        col.circle = "grey70",
        select.var = list(name =NULL, cos2 = 0.1, contrib = NULL))
-#e) Clustering Jerárquico
+#e) Clustering JerÃ¡rquico
 modelo1 <- hclust(dist(Datos.2),method = "complete")
 plot(modelo1,hang=-1)
 rect.hclust(modelo1, k=3, border="red")
@@ -160,7 +160,7 @@ rect.hclust(modelo4, k=3, border="magenta")
 Grupo<-cutree(modelo4,k=3)
 NDatos.2<-cbind(Datos.2,Grupo)
 write.csv(NDatos.2,"AlgoritmosRecomendacion2.csv")
-#f) Interpretación de resultados
+#f) InterpretaciÃ³n de resultados
 centros<-centers.hclust(Datos.2,modelo4,nclust=3,use.median=FALSE)
 centros
 rownames(centros)<-c("Cluster 1","Cluster 2","Cluster 3")
@@ -179,23 +179,23 @@ radarchart(centros,maxmin=TRUE,axistype=4,axislabcol="slategray4",
            pcol=c("green","blue","red"),
            plty=1,
            plwd=5,
-           title="Comparación de clústeres")
+           title="ComparaciÃ³n de clÃºsteres")
 
 legenda <-legend(1.5,1, legend=c("Cluster 1","Cluster 2","Cluster 3"),
                  seg.len=-1.4,
-                 title="Clústeres",
+                 title="ClÃºsteres",
                  pch=21, 
                  bty="n" ,lwd=3, y.intersp=1, horiz=FALSE,
                  col=c("green","blue","red"))
 ```
-Los individuos del clúster 1 son los que peor califican los productos mientras que los del clúster 2 son los que en general mejor califican. Los individuos del clúster 3 califican algunos aspectos muy bien y otros muy mal.
+Los individuos del clÃºster 1 son los que peor califican los productos mientras que los del clÃºster 2 son los que en general mejor califican. Los individuos del clÃºster 3 califican algunos aspectos muy bien y otros muy mal.
 ```{r 2.2, echo=T, cache=FALSE, fig.align='center'}
-#g) Clustering jerárquico sobre componentes principales
+#g) Clustering jerÃ¡rquico sobre componentes principales
 res.hcpc<-HCPC(pca.2 ,nb.clust=-1,consol=TRUE,min=3,max=3,graph=FALSE)
 #plot.HCPC(res.hcpc, choice="bar")
 #plot.HCPC(res.hcpc, choice="map")
 #plot.HCPC(res.hcpc, choice="3D.map", angle=60)
-#h) Método de K-medias
+#h) MÃ©todo de K-medias
 grupos<-kmeans(Datos.2,4,iter.max=200)
 # Inercia Total
 grupos$totss 
@@ -203,15 +203,15 @@ grupos$totss
 grupos$tot.withinss
 # inercia Inter-clases
 grupos$betweenss
-# Verificación del Teorema de Fisher
+# VerificaciÃ³n del Teorema de Fisher
 grupos$totss==grupos$tot.withinss+grupos$betweenss
-#i) Interpretación de resultados
+#i) InterpretaciÃ³n de resultados
 barplot(grupos$centers[1,],col='blue',las=2)
 barplot(grupos$centers[2,],col='red',las=2)
 barplot(grupos$centers[3,],col='green',las=2)
 barplot(grupos$centers[4,],col='orange',las=2)
 rownames(grupos$centers)<-c("Cluster 1","Cluster 2","Cluster 3","Cluster 4")
-barplot(t(grupos$centers),beside=TRUE,main = "Gráfico de Interpretación de Clases",col=c(1,2,3,4,5,6,7,8,9),ylim=c(0,10))
+barplot(t(grupos$centers),beside=TRUE,main = "GrÃ¡fico de InterpretaciÃ³n de Clases",col=c(1,2,3,4,5,6,7,8,9),ylim=c(0,10))
 centros<-grupos$centers
 rownames(centros)<-c("Cluster 1","Cluster 2","Cluster 3","Cluster 4")
 centros<-as.data.frame(centros)
@@ -225,16 +225,16 @@ radarchart(centros,maxmin=TRUE,axistype=4,axislabcol="slategray4",
            pcol=c("green","blue","red","orange"),
            plty=1,
            plwd=5,
-           title="Comparación de clústeres")
+           title="ComparaciÃ³n de clÃºsteres")
 
 legenda <-legend(1.5,1, legend=c("Cluster 1","Cluster 2","Cluster 3","Cluster 4"),
                  seg.len=-1.4,
-                 title="Clústeres",
+                 title="ClÃºsteres",
                  pch=21, 
                  bty="n" ,lwd=3, y.intersp=1, horiz=FALSE,
                  col=c("green","blue","red","orange"))
 ```
-Los individuos del clúster 3 son los que mejor califican mientras que los del clúster 2 los que peor lo hacen. Los del clúster 1 se encuentran entre los que califican bien algunas características y otras no tan bien.
+Los individuos del clÃºster 3 son los que mejor califican mientras que los del clÃºster 2 los que peor lo hacen. Los del clÃºster 1 se encuentran entre los que califican bien algunas caracterÃ­sticas y otras no tan bien.
 ```{r 2.3, echo=T, cache=FALSE, fig.align='center'}
 #j) Codo de Jambu
 InerciaIC<-rep(0,50)
@@ -277,7 +277,7 @@ Attribute Information:
 * ERP: estimated relative performance from the original article (integer)
 
 ```{r 3.1, echo=T, cache=FALSE, fig.align='center'}
-#b) Clústering jerárquico
+#b) ClÃºstering jerÃ¡rquico
 Datos.3 <- read.csv("machine.csv",header=TRUE, sep=",", dec=".")
 str(Datos.3)
 dim(Datos.3)
@@ -285,7 +285,7 @@ D<-daisy(Datos.3, metric = "euclidean")
 jer<-hclust(D, method = "complete")
 plot(jer)
 rect.hclust(jer, k = 4, border = "red")
-#Interpretación con datos cuantitativos
+#InterpretaciÃ³n con datos cuantitativos
 centros<-centers.hclust(Datos.3[,-c(1,2)],jer,nclust=4,use.median=FALSE)
 centros
 rownames(centros)<-c("Cluster 1","Cluster 2","Cluster 3","Cluster 4")
@@ -300,19 +300,19 @@ radarchart(centros,maxmin=TRUE,axistype=4,axislabcol="slategray4",
            pcol=c("green","blue","red","orange"),
            plty=1,
            plwd=5,
-           title="Comparación de clústeres")
+           title="ComparaciÃ³n de clÃºsteres")
 
 legenda <-legend(1.5,1, legend=c("Cluster 1","Cluster 2","Cluster 3","Cluster 4"),
                  seg.len=-1.4,
-                 title="Clústeres",
+                 title="ClÃºsteres",
                  pch=21, 
                  bty="n" ,lwd=3, y.intersp=1, horiz=FALSE,
                  col=c("green","blue","red","orange"))
 ```
-Según el gráfico de araña hay un grupo de CPU's (clúster 1) con buena memoria caché pero quedan rezagados en las demás características. Los elementos de clúster 2 tiene la duración de ciclos más grande, asimismo un desempeño malo en las otras caracterísicas. Los CPU's del clúster 3 son regulares en todo y finalmente los del clúster4 son los sobresalientes, cuya duración de ciclo esla más baja y tiene los valores más altos en casi todas las características.
+SegÃºn el grÃ¡fico de araÃ±a hay un grupo de CPU's (clÃºster 1) con buena memoria cachÃ© pero quedan rezagados en las demÃ¡s caracterÃ­sticas. Los elementos de clÃºster 2 tiene la duraciÃ³n de ciclos mÃ¡s grande, asimismo un desempeÃ±o malo en las otras caracterÃ­sicas. Los CPU's del clÃºster 3 son regulares en todo y finalmente los del clÃºster4 son los sobresalientes, cuya duraciÃ³n de ciclo esla mÃ¡s baja y tiene los valores mÃ¡s altos en casi todas las caracterÃ­sticas.
 
 ```{r 3.2, echo=T, cache=FALSE, fig.align='center'}
-#Interpretación con variables cualitativas
+#InterpretaciÃ³n con variables cualitativas
 grupo <- cutree(jer, k = 4)
 NDatos <- cbind(Datos.3, grupo)
 cluster <- NDatos$grupo
@@ -329,12 +329,12 @@ sel.cluster4 <- match(cluster, 4, 0)
 Datos.Cluster4 <- NDatos[sel.cluster4 > 0,]
 dim(Datos.Cluster4)
 plot(Datos.3$Vendor, col = heat.colors(30), las = 2, main = "Variable Vendor - Todos los datos")
-plot(Datos.Cluster1$Vendor, col = heat.colors(30), las = 2, main = "Variable Vendor - Clúster 1")
-plot(Datos.Cluster2$Vendor, col = heat.colors(30), las = 2, main = "Variable Vendor - Clúster 2")
-plot(Datos.Cluster3$Vendor, col = heat.colors(30), las = 2, main = "Variable Vendor - Clúster 3")
-plot(Datos.Cluster4$Vendor, col = heat.colors(30), las = 2, main = "Variable Vendor - Clúster 4")
+plot(Datos.Cluster1$Vendor, col = heat.colors(30), las = 2, main = "Variable Vendor - ClÃºster 1")
+plot(Datos.Cluster2$Vendor, col = heat.colors(30), las = 2, main = "Variable Vendor - ClÃºster 2")
+plot(Datos.Cluster3$Vendor, col = heat.colors(30), las = 2, main = "Variable Vendor - ClÃºster 3")
+plot(Datos.Cluster4$Vendor, col = heat.colors(30), las = 2, main = "Variable Vendor - ClÃºster 4")
 ```
-Se observa como la mayoría de CPU's caen en el clúster 2, apenas 3 CPU's son los que tienen un desempeño sobresaliente (clúster 4).
+Se observa como la mayorÃ­a de CPU's caen en el clÃºster 2, apenas 3 CPU's son los que tienen un desempeÃ±o sobresaliente (clÃºster 4).
 
 ```{r 3.3, echo=T, cache=FALSE, fig.align='center'}
 res <- cmdscale(D,eig=TRUE, k=2) 
@@ -343,7 +343,7 @@ y <- res$points[,2]
 plot(x, y, xlab="Componente 1", ylab="Componente 2",main="MDS", type="n")
 text(x, y, labels = row.names(Datos.3), cex=.7) 
 ```
-De acuerdo a este Escalamiento Multidimensional se pueden identificar 2 o hasta 3 clústeres bien definidos.
+De acuerdo a este Escalamiento Multidimensional se pueden identificar 2 o hasta 3 clÃºsteres bien definidos.
 
 
 ###**Ejercicio 4**
@@ -358,7 +358,7 @@ cos2.ind<-(pca.4$ind$cos2[,1]+pca.4$ind$cos2[,2])*100
 cos2.ind
 cos2.var<-(pca.4$var$cos2[,1]+pca.4$var$cos2[,2])*100
 cos2.var
-#2) Clústeres en el Plano Principal
+#2) ClÃºsteres en el Plano Principal
 fviz_pca_ind(pca.4,axes = c(1, 2), geom = c("point", "text"),
        label = "all", invisible = "none", labelsize = 4,
        pointsize = 2, habillage = "none",
@@ -366,10 +366,10 @@ fviz_pca_ind(pca.4,axes = c(1, 2), geom = c("point", "text"),
        col.ind = "red", col.ind.sup = "blue", alpha.ind = 1,
        select.ind = list(name = NULL, cos2 = 0.1, contrib = NULL))
 ```
-En el plano principal se logran identificar visualmente 3 o 4 clústeres.
+En el plano principal se logran identificar visualmente 3 o 4 clÃºsteres.
 
 ```{r 4.2, echo=T, cache=FALSE, fig.align='center'}
-#3) Círculo de correlaciones
+#3) CÃ­rculo de correlaciones
 fviz_pca_var(pca.4, axes = c(1, 2), geom = c("arrow", "text"),
        label = "all", invisible = "none", labelsize = 4,
        col.var = "blue", alpha.var = 1, col.quanti.sup = "blue",
@@ -377,18 +377,18 @@ fviz_pca_var(pca.4, axes = c(1, 2), geom = c("arrow", "text"),
        select.var = list(name =NULL, cos2 = 0.1, contrib = NULL))
 ```
 
-*	Se observa una alta correlación entre Caterpillar con empresas como Du Pont, IBM y McDonalds.
+*	Se observa una alta correlaciÃ³n entre Caterpillar con empresas como Du Pont, IBM y McDonalds.
 
-*	McDonalds y DuPont presentan una alta correlación entre sí con respecto al índice DJI.
+*	McDonalds y DuPont presentan una alta correlaciÃ³n entre sÃ­ con respecto al Ã­ndice DJI.
 
-*	Coca Cola e IBM también presentan una alta correlación entre sí.
+*	Coca Cola e IBM tambiÃ©n presentan una alta correlaciÃ³n entre sÃ­.
 
-*	El índice de AT&T presenta una alta correlación con el de Coca Cola.
+*	El Ã­ndice de AT&T presenta una alta correlaciÃ³n con el de Coca Cola.
 
-*	Dos empresas de Telecomunicaciones como los son Verizon Wireless y AT&T tienen una alta correlación en sus índices.
+*	Dos empresas de Telecomunicaciones como los son Verizon Wireless y AT&T tienen una alta correlaciÃ³n en sus Ã­ndices.
 
 ```{r 4.3, echo=T, cache=FALSE, fig.align='center'}
-#4) Sobreposición del círculo y el plano
+#4) SobreposiciÃ³n del cÃ­rculo y el plano
 fviz_pca_biplot(pca.4, axes = c(1, 2), geom = c("point", "text"),
    label = "all", invisible = "none", labelsize = 4, pointsize = 2,
     habillage = "none", addEllipses = FALSE, ellipse.level = 1,
@@ -399,14 +399,14 @@ fviz_pca_biplot(pca.4, axes = c(1, 2), geom = c("point", "text"),
     select.ind = list(name = NULL, cos2 = 0.1, contrib = NULL))
 ```
 
-*	Se observa en términos generales que el clúster de los cuadrantes superiores contiene individuos cuyos índices se comportan similares para las compañías BAC, CSCO, MSFT, GE, WMT, XOM, entre otros.
+*	Se observa en tÃ©rminos generales que el clÃºster de los cuadrantes superiores contiene individuos cuyos Ã­ndices se comportan similares para las compaÃ±Ã­as BAC, CSCO, MSFT, GE, WMT, XOM, entre otros.
 
-*	En las fechas del cuadrante inferior derecho, la variación de los índices tuvo un comportamiento parecido para compañías como McDonald's, Caterpillar, IBM, AT&T, Verizon entre otras.
+*	En las fechas del cuadrante inferior derecho, la variaciÃ³n de los Ã­ndices tuvo un comportamiento parecido para compaÃ±Ã­as como McDonald's, Caterpillar, IBM, AT&T, Verizon entre otras.
 
 ```{r 4.4, echo=T, cache=FALSE, fig.align='center'}
-#5) Interpretación del plano principal
+#5) InterpretaciÃ³n del plano principal
 ``` 
-Analizando el plano principal, mi interpretación es que a durante el año 2010 la variación de los índices siguió un comportamiento de "temporadas", es decir, dependiendo de la fecha el comportamiento (variación) del índice DJ es similar para algunas empresas y conforme pasa el tiempo deja de serlo para estas empresas, comenzando a serlo para otras. Durante un tiempo durante el año, representado en el plano principal en el cuadrante inferior izquierdo, ninguno de los mercados se comportan de manera similar entre sí.
+Analizando el plano principal, mi interpretaciÃ³n es que a durante el aÃ±o 2010 la variaciÃ³n de los Ã­ndices siguiÃ³ un comportamiento de "temporadas", es decir, dependiendo de la fecha el comportamiento (variaciÃ³n) del Ã­ndice DJ es similar para algunas empresas y conforme pasa el tiempo deja de serlo para estas empresas, comenzando a serlo para otras. Durante un tiempo durante el aÃ±o, representado en el plano principal en el cuadrante inferior izquierdo, ninguno de los mercados se comportan de manera similar entre sÃ­.
 
 
 ###**Ejercicio 5**
@@ -418,27 +418,27 @@ x <- res5$points[,1]
 y <- res5$points[,2]
 plot(x, y, xlab="Componente 1", ylab="Componente 2",main="MDS", type="n")
 text(x, y, labels = row.names(eurodist.matriz), cex=.7)
-#Rotación
+#RotaciÃ³n
 y <- -y
-plot(x, y, xlab="Componente 1", ylab="Componente 2",main="MDS con rotación", type="n")
+plot(x, y, xlab="Componente 1", ylab="Componente 2",main="MDS con rotaciÃ³n", type="n")
 text(x, y, labels = row.names(eurodist.matriz), cex=.7)
 ``` 
 
-Rotando el MDS por el eje y se obtiene una ubicación en el plot que se asemeja a la ubicación en el mapa.
+Rotando el MDS por el eje y se obtiene una ubicaciÃ³n en el plot que se asemeja a la ubicaciÃ³n en el mapa.
 
 
 
 ###**Optativa**
 ```{r 6.1, echo=T, cache=TRUE, fig.align='center'}
 
-#a) Función distancia de Chebychev
+#a) FunciÃ³n distancia de Chebychev
 chebyshev <- function(u,v) {
   dmax <- NA
   dmax <- max (abs(u-v))
   return(dmax)
 }
 
-#b) Función matriz de distancias
+#b) FunciÃ³n matriz de distancias
 matriz <- function(df) {
   df2 <- df
   for (i in 1:nrow(df)) {
@@ -450,7 +450,7 @@ matriz <- function(df) {
   return(df3)
 }
 
-#c) Clústering jerárquico con distancia de Chebysev
+#c) ClÃºstering jerÃ¡rquico con distancia de Chebysev
 Datos.6 <- read.table("EjemploAlgoritmosRecomendacion.csv", header=TRUE, sep=';',dec=',',row.names=1)
 modelo6 <- hclust(matriz(Datos.6),method = "ward")
 plot(modelo6,hang=-1)
@@ -467,13 +467,13 @@ radarchart(centros,maxmin=TRUE,axistype=4,axislabcol="slategray4",
            pcol=c("green","blue","red"),
            plty=1,
            plwd=5,
-           title="Comparación de clústeres")
+           title="ComparaciÃ³n de clÃºsteres")
 
 legenda <-legend(1.5,1, legend=c("Cluster 1","Cluster 2","Cluster 3"),
                  seg.len=-1.4,
-                 title="Clústeres",
+                 title="ClÃºsteres",
                  pch=21, 
                  bty="n" ,lwd=3, y.intersp=1, horiz=FALSE,
                  col=c("green","blue","red"))
 ```
-Presenta variaciones principalmente en el clúster 1, otorgando mejor calificación a Servicio de Retorno e Imagen de Producto.
+Presenta variaciones principalmente en el clÃºster 1, otorgando mejor calificaciÃ³n a Servicio de Retorno e Imagen de Producto.
