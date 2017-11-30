@@ -1,6 +1,6 @@
 ---
 title: "Tarea3_pablo_acuna"
-author: "Pablo Acu馻 Quir髎"
+author: "Pablo Acu帽a Quir贸s"
 output: html_document
 ---
 
@@ -51,12 +51,12 @@ ttesting <- datos[muestra,]
 taprendizaje <- datos[-muestra,]
 ```
 
-#### Generaci髇 de modelos
+#### Generaci贸n de modelos
 ```{r}
 #Bayes
 modelo.bayes <- naiveBayes(Income~.,data=taprendizaje)
 
-#M醧uinas de Soporte Vectorial
+#M谩quinas de Soporte Vectorial
 modelo.svm.lineal <- svm(Income~., data = taprendizaje, kernel = "linear",probability = TRUE)
 
 modelo.svm.radial <- svm(Income~., data = taprendizaje,probability = TRUE)
@@ -74,7 +74,7 @@ modelo.ada<-ada(Income~.,data=taprendizaje,iter=20,nu=1,type="discrete")
 modelo.nnet<-nnet(Income~.,data=taprendizaje,size = 4, rang = 0.1,decay = 5e-4, maxit = 100,trace=FALSE)
 ```
 
-#### Predicci髇 y curvas ROC
+#### Predicci贸n y curvas ROC
 ```{r, fig.align='center'}
 #Bayes
 prediccion.bayes<-predict(modelo.bayes,ttesting,type="raw")
@@ -83,7 +83,7 @@ Score.bayes <- prediccion.bayes[,2]
 Clase.bayes<-ttesting$Income
 plotROC(Score.bayes,Clase.bayes)
 
-#M醧uinas de Soporte Vectorial
+#M谩quinas de Soporte Vectorial
 prediccion.svm.lineal<-predict(modelo.svm.lineal,ttesting,probability = TRUE)
 head(attributes(prediccion.svm.lineal)$probabilities)
 Score.svm.lineal <- attributes(prediccion.svm.lineal)$probabilities[,2]
@@ -132,7 +132,7 @@ Observando las curvas parece ser que el mejor modelo es el de Forest (Curva amar
 ```{r}
 #Bayes
 areaROC(Score.bayes,Clase.bayes)
-#M醧uinas de Soporte Vectorial
+#M谩quinas de Soporte Vectorial
 #Lineal
 areaROC(Score.svm.lineal,Clase.svm.lineal)
 #Radial
@@ -147,7 +147,7 @@ areaROC(Score.ada,Clase.ada)
 areaROC(Score.nnet,Clase.nnet)
 ```
 
-Se confirma que el modelo de Forest es el que tiene el mayor 醨ea bajo la curva por lo que seg鷑 閟te criterio es el mejor.
+Se confirma que el modelo de Forest es el que tiene el mayor 谩rea bajo la curva por lo que seg煤n 茅ste criterio es el mejor.
 
 
 ###**Ejercicio 2**
@@ -193,11 +193,11 @@ for(i in 1:5) {
 
 ```
 
-Gr醘ica de variaci髇 de error:
+Gr谩fica de variaci贸n de error:
 ```{r}
-plot(v.error.tt, col = "blue", type = "b", ylim = c(min(v.error.kg,v.error.tt) - 0.01, max(v.error.kg,v.error.tt) + 0.01), main = "Variaci髇 del Error - M閠odo Training", xlab = "N鷐ero de iteraci髇", ylab = "Estimaci髇 del Error")
+plot(v.error.tt, col = "blue", type = "b", ylim = c(min(v.error.kg,v.error.tt) - 0.01, max(v.error.kg,v.error.tt) + 0.01), main = "Variaci贸n del Error - M茅todo Training", xlab = "N煤mero de iteraci贸n", ylab = "Estimaci贸n del Error")
 points(v.error.kg, col = "red", type = "b")
-legend("topright", legend = c("Tabla Testing","K-閟imo grupo"), col = c("blue","red"), lty = 1, lwd = 1)
+legend("topright", legend = c("Tabla Testing","K-茅simo grupo"), col = c("blue","red"), lty = 1, lwd = 1)
 ```
 
 
@@ -243,15 +243,15 @@ for(i in 1:5) {
 }
 ```
 
-Gr醘ica de variaci髇 de error:
+Gr谩fica de variaci贸n de error:
 ```{r}
-plot(v.error.tt.2, col = "blue", type = "b", ylim = c(min(v.error.kg.2,v.error.tt.2) - 0.01, max(v.error.kg.2,v.error.tt.2) + 0.01), main = "Variaci髇 del Error - M閠odo K-fold", xlab = "N鷐ero de iteraci髇", ylab = "Estimaci髇 del Error")
+plot(v.error.tt.2, col = "blue", type = "b", ylim = c(min(v.error.kg.2,v.error.tt.2) - 0.01, max(v.error.kg.2,v.error.tt.2) + 0.01), main = "Variaci贸n del Error - M茅todo K-fold", xlab = "N煤mero de iteraci贸n", ylab = "Estimaci贸n del Error")
 points(v.error.kg.2, col = "red", type = "b")
-legend("topright", legend = c("Tabla Testing","K-閟imo grupo"), col = c("blue","red"), lty = 1, lwd = 1)
+legend("topright", legend = c("Tabla Testing","K-茅simo grupo"), col = c("blue","red"), lty = 1, lwd = 1)
 ```
 
-####c) Conclusi髇
-Se puede observar que para ambos m閠odos de predicci髇, el sistema que presenta una menor variabilidad en el c醠culo del error es el de K-閟imo grupo o K-fold. Ahora bien, para este problema en espec韋ico el modelado a trav閟 del m閠odo de k medias produce un error m醩 bajo que el modelado con el m閠odo de redes neuronales. La principal conclusi髇 que se puede sacar es que hay mejores maneras de seleccionar la tabla de testing vs el m閠odo que se ven韆 utilizando de training-testing. El m閠odo de K-fold permite reducir el error lo que hace al modelo m醩 eficiente.
+####c) Conclusi贸n
+Se puede observar que para ambos m茅todos de predicci贸n, el sistema que presenta una menor variabilidad en el c谩lculo del error es el de K-茅simo grupo o K-fold. Ahora bien, para este problema en espec铆fico el modelado a trav茅s del m茅todo de k medias produce un error m谩s bajo que el modelado con el m茅todo de redes neuronales. La principal conclusi贸n que se puede sacar es que hay mejores maneras de seleccionar la tabla de testing vs el m茅todo que se ven铆a utilizando de training-testing. El m茅todo de K-fold permite reducir el error lo que hace al modelo m谩s eficiente.
 
 
 ###**Ejercicio 3**
