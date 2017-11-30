@@ -1,0 +1,1433 @@
+---
+title: "Tarea4_pablo_acuna"
+author: "Pablo Acuña Quirós"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(rmarkdown)
+library(readxl)
+suppressWarnings(suppressMessages(library(kknn)))
+suppressWarnings(suppressMessages(library(e1071)))
+suppressWarnings(suppressMessages(library(class)))
+suppressWarnings(suppressMessages(library(rpart)))
+suppressWarnings(suppressMessages(library(rpart.plot)))
+suppressWarnings(suppressMessages(library(randomForest)))
+suppressWarnings(suppressMessages(library(ada)))
+suppressWarnings(suppressMessages(library(nnet)))
+suppressWarnings(suppressMessages(library(ROCR)))
+suppressWarnings(suppressMessages(library(caret)))
+setwd("C:/Users/Paacun/Google Drive/Promidat/Metodos_Avanzados_en Mineria_de_Datos_Legrende/Tarea4")
+```
+
+###**Ejercicio 1**
+
+#### a) Codo de Jambu
+```{r,fig.align='center'}
+start.time <- Sys.time()
+datos1 <- read.csv("EjemploAlgoritmosRecomendacion.csv", header=TRUE, sep=";", dec=",", row.names=1)
+dim(datos1)
+str(datos1)
+InerciaIC.Hartigan<-rep(0,30)
+InerciaIC.Lloyd<-rep(0,30)
+InerciaIC.Forgy<-rep(0,30)
+InerciaIC.MacQueen<-rep(0,30)
+for(k in 1:30) {
+   grupos<-kmeans(datos1,k,iter.max=200,algorithm = "Hartigan-Wong")
+   InerciaIC.Hartigan[k]<-grupos$tot.withinss
+   grupos<-kmeans(datos1,k,iter.max=200,algorithm = "Lloyd")
+   InerciaIC.Lloyd[k]<-grupos$tot.withinss
+   grupos<-kmeans(datos1,k,iter.max=200,algorithm = "Forgy")
+   InerciaIC.Forgy[k]<-grupos$tot.withinss
+   grupos<-kmeans(datos1,k,iter.max=200,algorithm = "MacQueen")
+   InerciaIC.MacQueen[k]<-grupos$tot.withinss
+}
+plot(InerciaIC.Hartigan,col="blue",type="b")
+points(InerciaIC.Lloyd,col="red",type="b")
+points(InerciaIC.Forgy,col="green",type="b")
+points(InerciaIC.MacQueen,col="magenta",type="b")
+legend("topright",legend = c("Hartigan","Lloyd","Forgy","MacQueen"), col = c("blue", 
+    "red","green","magenta"), lty = 1, lwd = 1)
+
+```
+
+Según mi interpretación con k=4 se estabiliza la variación de la inercia intra clase.
+
+
+#### b) Selección de algoritmo para k-medias
+```{r,fig.align='center'}
+Hartigan<-0
+Lloyd<-0
+Forgy<-0
+MacQueen<-0
+k<-4
+for(i in 1:40) {
+  grupos<-kmeans(datos1,k,iter.max=200,algorithm = "Hartigan-Wong")
+  Hartigan<-Hartigan+grupos$betweenss
+  grupos<-kmeans(datos1,k,iter.max=200,algorithm = "Lloyd")
+  Lloyd<-Lloyd+grupos$betweenss
+  grupos<-kmeans(datos1,k,iter.max=200,algorithm = "Forgy")
+  Forgy<-Forgy+grupos$betweenss
+  grupos<-kmeans(datos1,k,iter.max=200,algorithm = "MacQueen")
+  MacQueen<-MacQueen+grupos$betweenss
+}  
+Hartigan/40
+Lloyd/40
+Forgy/40
+MacQueen/40
+```
+El algoritmo de Hartigan es el que maximiza la inercia inter-clases y por ende minimiza la inercia intra-clases.
+
+
+#### c) Ejercicio con nstart=100
+```{r, warning=FALSE,fig.align='center'}
+InerciaIC.Hartigan<-rep(0,30)
+InerciaIC.Lloyd<-rep(0,30)
+InerciaIC.Forgy<-rep(0,30)
+InerciaIC.MacQueen<-rep(0,30)
+for(k in 1:30) {
+   grupos<-kmeans(datos1,k,iter.max=200,nstart=100,algorithm = "Hartigan-Wong")
+   InerciaIC.Hartigan[k]<-grupos$tot.withinss
+   grupos<-kmeans(datos1,k,iter.max=200,nstart=100,algorithm = "Lloyd")
+   InerciaIC.Lloyd[k]<-grupos$tot.withinss
+   grupos<-kmeans(datos1,k,iter.max=200,nstart=100,algorithm = "Forgy")
+   InerciaIC.Forgy[k]<-grupos$tot.withinss
+   grupos<-kmeans(datos1,k,iter.max=200,nstart=100,algorithm = "MacQueen")
+   InerciaIC.MacQueen[k]<-grupos$tot.withinss
+}
+plot(InerciaIC.Hartigan,col="blue",type="b")
+points(InerciaIC.Lloyd,col="red",type="b")
+points(InerciaIC.Forgy,col="green",type="b")
+points(InerciaIC.MacQueen,col="magenta",type="b")
+legend("topright",legend = c("Hartigan","Lloyd","Forgy","MacQueen"), col = c("blue", 
+    "red","green","magenta"), lty = 1, lwd = 1)
+Hartigan<-0
+Lloyd<-0
+Forgy<-0
+MacQueen<-0
+k<-4
+for(i in 1:40) {
+  grupos<-kmeans(datos1,k,iter.max=200,nstart=100,algorithm = "Hartigan-Wong")
+  Hartigan<-Hartigan+grupos$betweenss
+  grupos<-kmeans(datos1,k,iter.max=200,nstart=100,algorithm = "Lloyd")
+  Lloyd<-Lloyd+grupos$betweenss
+  grupos<-kmeans(datos1,k,iter.max=200,nstart=100,algorithm = "Forgy")
+  Forgy<-Forgy+grupos$betweenss
+  grupos<-kmeans(datos1,k,iter.max=200,nstart=100,algorithm = "MacQueen")
+  MacQueen<-MacQueen+grupos$betweenss
+}  
+Hartigan/40
+Lloyd/40
+Forgy/40
+MacQueen/40
+```
+
+El parámetro nstart toma múltiples configuraciones iniciales y a partir del resultado se reporta el mejor. El agregar éste parámetro estabiliza la variación de la inercia. Se observa además que usando nstart se logra aumentar la inercia inter clase, esto indica que los clusters están mejor definidos y sus individuos más agrupados entre si.
+
+
+
+###**Ejercicio 2**
+
+#### Generación de muestra aleatoria
+```{r}
+datos2 <- read.csv("DatosIngresos.csv", header=TRUE, sep=";", dec=",")
+str(datos2)
+#Dimensión de la tabla original
+summary(datos2$Income)
+#Proporción de la tabla original
+prop.table(summary(datos2$Income))
+muestra <- sample(dim(datos2)[1], 2000, replace = FALSE)
+tmuestra <- datos2[muestra,]
+#Dimensión de la tabla original
+summary(tmuestra$Income)
+#Proporción de la tabla de muetra
+prop.table(summary(tmuestra$Income))
+```
+
+
+####a) Calibración del modelo ADA 
+```{r,fig.align='center'}
+n <- dim(tmuestra)[1]
+deteccion.mayor.discrete<-rep(0,6)
+deteccion.mayor.real<-rep(0,6)
+deteccion.mayor.gentle<-rep(0,6)
+
+# Validación cruzada 6 veces
+for(i in 1:6) {
+  grupos <- createFolds(1:n,5)
+  mayor.discrete<-0
+  mayor.real<-0
+  mayor.gentle<-0
+
+
+  for(k in 1:5) {    
+      muestra <- grupos[[k]]
+      ttesting <- tmuestra[muestra,]
+      taprendizaje <- tmuestra[-muestra,]
+      
+      modelo<-ada(Income~.,data=taprendizaje,iter=60,nu=1,type="discrete")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.discrete<- mayor.discrete+MC[2,2]
+      
+      modelo<-ada(Income~.,data=taprendizaje,iter=60,nu=1,type="real")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.real<- mayor.real+MC[2,2]
+      
+      modelo<-ada(Income~.,data=taprendizaje,iter=60,nu=1,type="gentle")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.gentle<- mayor.gentle+MC[2,2]      
+  }
+  
+   deteccion.mayor.discrete[i]<-mayor.discrete
+   deteccion.mayor.real[i]<-mayor.real
+   deteccion.mayor.gentle[i]<-mayor.gentle
+
+}
+plot(deteccion.mayor.discrete, col = "green", type = "b",  ylim = c(min(deteccion.mayor.discrete, deteccion.mayor.real, deteccion.mayor.gentle)-5, max(deteccion.mayor.discrete, deteccion.mayor.real, deteccion.mayor.gentle)+10), main = "Detección de ingreso >50K - ada boosting", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+points(deteccion.mayor.real, col = "blue", type = "b")
+points(deteccion.mayor.gentle, col = "red", type = "b")
+legend("topright", legend = c("Discrete","Real","Gentle"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+```
+No es posible determinar con claridad ya que la variación en la detección es similar para los tres métodos. Hasta éste punto se podría decir que los tres modelos producen valores parecidos y el algoritmo real es ligeramente mejor .
+
+
+####b) Cálculo de errores globales 
+```{r,fig.align='center'}
+n <- dim(tmuestra)[1]
+deteccion.error.discrete<-rep(0,6)
+deteccion.error.real<-rep(0,6)
+deteccion.error.gentle<-rep(0,6)
+
+for(i in 1:6) {
+  grupos <- createFolds(1:n,5)
+  error.discrete<-0
+  error.real<-0
+  error.gentle<-0
+  
+  for(k in 1:5) {    
+      muestra <- grupos[[k]]
+      ttesting <- tmuestra[muestra,]
+      taprendizaje <- tmuestra[-muestra,]
+      
+      modelo<-ada(Income~.,data=taprendizaje,iter=60,nu=1,type="discrete")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.discrete<-error.discrete+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo<-ada(Income~.,data=taprendizaje,iter=60,nu=1,type="real")
+      prediccion<-predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.real<-error.real+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo<-ada(Income~.,data=taprendizaje,iter=60,nu=1,type="gentle")
+      prediccion <- predict(modelo, ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.gentle<-error.gentle+(1-(sum(diag(MC)))/sum(MC))*100    
+      
+   }
+   deteccion.error.discrete[i]<-error.discrete/5
+   deteccion.error.real[i]<-error.real/5
+   deteccion.error.gentle[i]<-error.gentle/5
+
+}
+plot(deteccion.error.discrete, col = "green", type = "b",  ylim = c(min(deteccion.error.discrete, deteccion.error.real, deteccion.error.gentle), max(deteccion.error.discrete, deteccion.error.real, deteccion.error.gentle)+1), main = "Detección del ERROR - ada boosting", xlab = "Número de iteración", ylab = "ERROR Cometido")
+points(deteccion.error.real, col = "blue", type = "b")
+points(deteccion.error.gentle, col = "red", type = "b")
+
+legend("topright", legend = c("Discrete","Real","Gentle"), col = c("green","blue","red"), lty = 1, lwd = 2)
+```
+
+El algoritmo Real es el que minimiza el error global a lo largo de las 6 iteraciones.
+
+
+####d) Selección de método
+La detección de errores es muy similar, sin embargo el algoritmo Real es el que minimiza el error global por lo tanto basado en la información anterior se a  éste como el algoritmo a utilizar.
+
+
+
+
+###**Ejercicio 3**
+
+Para este ejercicio se va a utilizar la muestra de 2000 indiviuos utilizada en el ejercicio 2 (tmuestra). Debido a que ya se calibró el método de Potenciación, se va a proceder a calibrar el resto de métodos, a saber, Bayes, SVM, Arboles, Bosques y Redes Neuronales.
+
+####a) Predicción Income > 50K
+```{r,fig.align='center'}
+n <- dim(tmuestra)[1]
+
+#Selección del mejor método de Bayes 
+#Según lo indicado en http://www.learnbymarketing.com/tutorials/naive-bayes-in-r/ se va a variar el parámetro Laplace para ver si tiene algún efecto.
+
+deteccion.mayor.laplace.0<-rep(0,6)
+deteccion.mayor.laplace.1<-rep(0,6)
+deteccion.mayor.laplace.3<-rep(0,6)
+
+# Validación cruzada 6 veces
+for(i in 1:6) {
+  grupos <- createFolds(1:n,5)
+  mayor.laplace.0<-0
+  mayor.laplace.1<-0
+  mayor.laplace.3<-0
+
+  for(k in 1:5) {    
+      muestra <- grupos[[k]]
+      ttesting <- tmuestra[muestra,]
+      taprendizaje <- tmuestra[-muestra,]
+      
+      modelo <- naiveBayes(Income~.,data=taprendizaje,laplace=0)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.laplace.0<- mayor.laplace.0+MC[2,2]
+      
+      modelo <- naiveBayes(Income~.,data=taprendizaje,laplace=1)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.laplace.1<- mayor.laplace.1+MC[2,2]
+      
+      modelo <- naiveBayes(Income~.,data=taprendizaje,laplace=3)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.laplace.3<- mayor.laplace.3+MC[2,2]  
+  }
+  
+   deteccion.mayor.laplace.0[i]<-mayor.laplace.0
+   deteccion.mayor.laplace.1[i]<-mayor.laplace.1
+   deteccion.mayor.laplace.3[i]<-mayor.laplace.3
+
+}
+plot(deteccion.mayor.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.mayor.laplace.0, deteccion.mayor.laplace.1, deteccion.mayor.laplace.3)-5, max(deteccion.mayor.laplace.0, deteccion.mayor.laplace.1, deteccion.mayor.laplace.3)+5), main = "Detección de ingreso >50K", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+points(deteccion.mayor.laplace.1, col = "blue", type = "b")
+points(deteccion.mayor.laplace.3, col = "red", type = "b")
+legend("topright", legend = c("Laplace 0","Laplace 1","Laplace 3"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+
+
+
+#Selección del mejor método de SVM
+
+deteccion.mayor.radial<-rep(0,6)
+deteccion.mayor.lineal<-rep(0,6)
+deteccion.mayor.polynomial<-rep(0,6)
+deteccion.mayor.sigmoid<-rep(0,6)
+
+# Validación cruzada 6 veces
+for(i in 1:6) {
+  grupos <- createFolds(1:n,5)
+  mayor.radial<-0
+  mayor.lineal<-0
+  mayor.polynomial<-0
+  mayor.sigmoid<-0
+
+  for(k in 1:5) {    
+      muestra <- grupos[[k]]
+      ttesting <- tmuestra[muestra,]
+      taprendizaje <- tmuestra[-muestra,]
+      
+      modelo <- svm(Income~.,data=taprendizaje,kernel="radial")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.radial<- mayor.radial+MC[2,2]
+      
+      modelo <- svm(Income~.,data=taprendizaje,kernel="linear")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.lineal<- mayor.lineal+MC[2,2]
+      
+      modelo <- svm(Income~.,data=taprendizaje,kernel="polynomial")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.polynomial<- mayor.polynomial+MC[2,2]  
+      
+      modelo <- svm(Income~.,data=taprendizaje,kernel="sigmoid")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.sigmoid<- mayor.sigmoid+MC[2,2]
+  }
+  
+   deteccion.mayor.radial[i]<-mayor.radial
+   deteccion.mayor.lineal[i]<-mayor.lineal
+   deteccion.mayor.polynomial[i]<-mayor.polynomial
+   deteccion.mayor.sigmoid[i]<-mayor.sigmoid
+
+}
+plot(deteccion.mayor.radial, col = "green", type = "b",  ylim = c(min(deteccion.mayor.radial,deteccion.mayor.lineal,deteccion.mayor.polynomial,deteccion.mayor.sigmoid)-5, max(deteccion.mayor.radial,deteccion.mayor.lineal,deteccion.mayor.polynomial,deteccion.mayor.sigmoid)+150), main = "Detección de ingreso >50K - SVM", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+points(deteccion.mayor.lineal, col = "blue", type = "b")
+points(deteccion.mayor.polynomial, col = "red", type = "b")
+points(deteccion.mayor.sigmoid, col = "cyan", type = "b")
+legend("topright", legend = c("Radial","Lineal","Polynomial","Sigmoid"), col = c("green", 
+    "blue","red","cyan"), lty = 1, lwd = 1)
+
+
+
+
+#Selección del mejor método de Arbol
+#Se va a variar el parámetro maxdepth (Profundidad Máxima)
+
+deteccion.mayor.arbol.1<-rep(0,6)
+deteccion.mayor.arbol.2<-rep(0,6)
+deteccion.mayor.arbol.3<-rep(0,6)
+
+# Validación cruzada 6 veces
+for(i in 1:6) {
+  grupos <- createFolds(1:n,5)
+  mayor.arbol.1<-0
+  mayor.arbol.2<-0
+  mayor.arbol.3<-0
+
+  for(k in 1:5) {    
+      muestra <- grupos[[k]]
+      ttesting <- tmuestra[muestra,]
+      taprendizaje <- tmuestra[-muestra,]
+      
+      modelo <- rpart(Income~.,data=taprendizaje,control=rpart.control(maxdepth=5))
+      prediccion <- predict(modelo,ttesting,type='class')
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.arbol.1<- mayor.arbol.1+MC[2,2]
+      
+      modelo <- rpart(Income~.,data=taprendizaje,control=rpart.control(maxdepth=15))
+      prediccion <- predict(modelo,ttesting,type='class')
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.arbol.2<- mayor.arbol.2+MC[2,2]
+      
+      modelo <- rpart(Income~.,data=taprendizaje,control=rpart.control(maxdepth=25))
+      prediccion <- predict(modelo,ttesting,type='class')
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.arbol.3<- mayor.arbol.3+MC[2,2]
+  }
+  
+   deteccion.mayor.arbol.1[i]<-mayor.arbol.1
+   deteccion.mayor.arbol.2[i]<-mayor.arbol.2
+   deteccion.mayor.arbol.3[i]<-mayor.arbol.3
+}
+
+plot(deteccion.mayor.arbol.1, col = "green", type = "b",  ylim = c(min(deteccion.mayor.arbol.1,deteccion.mayor.arbol.2,deteccion.mayor.arbol.3)-5, max(deteccion.mayor.arbol.1,deteccion.mayor.arbol.2,deteccion.mayor.arbol.3)+5), main = "Detección de ingreso >50K - Arbol", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+points(deteccion.mayor.arbol.2, col = "blue", type = "b")
+points(deteccion.mayor.arbol.3, col = "red", type = "b")
+legend("topright", legend = c("5","15","25"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+
+
+
+#Selección del mejor método de Bosques
+#Se va a variar el parámetro ntree (Número de árboles)
+
+deteccion.mayor.bosques.500<-rep(0,6)
+deteccion.mayor.bosques.750<-rep(0,6)
+deteccion.mayor.bosques.1000<-rep(0,6)
+
+# Validación cruzada 6 veces
+for(i in 1:6) {
+  grupos <- createFolds(1:n,5)
+  mayor.bosques.500<-0
+  mayor.bosques.750<-0
+  mayor.bosques.1000<-0
+
+  for(k in 1:5) {    
+      muestra <- grupos[[k]]
+      ttesting <- tmuestra[muestra,]
+      taprendizaje <- tmuestra[-muestra,]
+      
+      modelo <- randomForest(Income~.,data=taprendizaje,importance=TRUE,ntree=500)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.bosques.500<- mayor.bosques.500+MC[2,2]
+      
+      modelo <- randomForest(Income~.,data=taprendizaje,importance=TRUE,ntree=750)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.bosques.750<- mayor.bosques.750+MC[2,2]
+      
+      modelo <- randomForest(Income~.,data=taprendizaje,importance=TRUE,ntree=1000)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.bosques.1000<- mayor.bosques.1000+MC[2,2]
+  }
+  
+   deteccion.mayor.bosques.500[i]<-mayor.bosques.500
+   deteccion.mayor.bosques.750[i]<-mayor.bosques.750
+   deteccion.mayor.bosques.1000[i]<-mayor.bosques.1000
+}
+
+plot(deteccion.mayor.bosques.500, col = "green", type = "b",  ylim = c(min(deteccion.mayor.bosques.500,deteccion.mayor.bosques.750,deteccion.mayor.bosques.1000)-5, max(deteccion.mayor.bosques.500,deteccion.mayor.bosques.750,deteccion.mayor.bosques.1000)+5), main = "Detección de ingreso >50K - Bosques", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+points(deteccion.mayor.bosques.750, col = "blue", type = "b")
+points(deteccion.mayor.bosques.1000, col = "red", type = "b")
+legend("topright", legend = c("500","750","1000"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+
+
+
+#Selección del mejor método de Redes Neuronales
+#Se va a variar el parámetro size (Número de capas ocultas)
+
+deteccion.mayor.redes.1<-rep(0,6)
+deteccion.mayor.redes.2<-rep(0,6)
+deteccion.mayor.redes.3<-rep(0,6)
+
+# Validación cruzada 6 veces
+for(i in 1:6) {
+  grupos <- createFolds(1:n,5)
+  mayor.redes.1<-0
+  mayor.redes.2<-0
+  mayor.redes.3<-0
+
+  for(k in 1:5) {    
+      muestra <- grupos[[k]]
+      ttesting <- tmuestra[muestra,]
+      taprendizaje <- tmuestra[-muestra,]
+      
+      modelo <- nnet(Income~.,data=taprendizaje,size = 5, rang = 0.1,decay = 5e-4, maxit = 100,trace=FALSE)
+      prediccion <- predict(modelo,ttesting[,-15],type="class")
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      if (dim(MC)[2]==1){
+      MC<-cbind(MC,c(0,0))
+      }
+      mayor.redes.1<- mayor.redes.1+MC[2,2]
+      
+      modelo <- nnet(Income~.,data=taprendizaje,size = 7, rang = 0.1,decay = 5e-4, maxit = 100,trace=FALSE)
+      prediccion <- predict(modelo,ttesting[,-15],type="class")
+      Actual<-ttesting[,15]
+      MC<-cbind(table(Actual,prediccion),c(0,0))
+      if (dim(MC)[2]==1){
+      MC<-cbind(MC,c(0,0))
+      }
+      mayor.redes.2<- mayor.redes.2+MC[2,2]
+      
+      modelo <- nnet(Income~.,data=taprendizaje,size = 9, rang = 0.1,decay = 5e-4, maxit = 100,trace=FALSE)
+      prediccion <- predict(modelo,ttesting[,-15],type="class")
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      if (dim(MC)[2]==1){
+      MC<-cbind(MC,c(0,0))
+      }
+      mayor.redes.3<- mayor.redes.3+MC[2,2]
+  }
+  
+   deteccion.mayor.redes.1[i]<-mayor.redes.1
+   deteccion.mayor.redes.2[i]<-mayor.redes.2
+   deteccion.mayor.redes.3[i]<-mayor.redes.3
+}
+
+plot(deteccion.mayor.redes.1, col = "green", type = "b",  ylim = c(min(deteccion.mayor.redes.1,deteccion.mayor.redes.2,deteccion.mayor.redes.3)-5, max(deteccion.mayor.redes.1,deteccion.mayor.redes.2,deteccion.mayor.redes.3)+5), main = "Detección de ingreso >50K - Redes Neuronales", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+points(deteccion.mayor.redes.2, col = "blue", type = "b")
+points(deteccion.mayor.redes.3, col = "red", type = "b")
+legend("topright", legend = c("5","7","9"), col = c("green","blue","red"), lty = 1, lwd = 1)
+
+
+
+
+#Selección del mejor método de K-vecinos
+
+deteccion.mayor.k.10<-rep(0,6)
+deteccion.mayor.k.25<-rep(0,6)
+deteccion.mayor.k.50<-rep(0,6)
+
+# Validación cruzada 6 veces
+for(i in 1:6) {
+  grupos <- createFolds(1:n,5)
+  mayor.k.10<-0
+  mayor.k.25<-0
+  mayor.k.50<-0
+
+
+  for(k in 1:5) {    
+      muestra <- grupos[[k]]
+      ttesting <- tmuestra[muestra,]
+      taprendizaje <- tmuestra[-muestra,]
+      
+      modelo <- train.kknn(Income~.,data=taprendizaje,kmax=10)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.k.10<- mayor.k.10+MC[2,2]
+      
+      modelo <- train.kknn(Income~.,data=taprendizaje,kmax=25)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.k.25<- mayor.k.25+MC[2,2]
+      
+      modelo <- train.kknn(Income~.,data=taprendizaje,kmax=50)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      mayor.k.50<- mayor.k.50+MC[2,2]
+  }
+  
+   deteccion.mayor.k.10[i]<-mayor.k.10
+   deteccion.mayor.k.25[i]<-mayor.k.25
+   deteccion.mayor.k.50[i]<-mayor.k.50
+
+}
+
+plot(deteccion.mayor.k.10, col = "green", type = "b",  ylim = c(min(deteccion.mayor.k.10,deteccion.mayor.k.25,deteccion.mayor.k.50)-5, max(deteccion.mayor.k.10,deteccion.mayor.k.25,deteccion.mayor.k.50)+5), main = "Detección de ingreso >50K - K-vecinos", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+points(deteccion.mayor.k.25, col = "blue", type = "b")
+points(deteccion.mayor.k.50, col = "red", type = "b")
+legend("topright", legend = c("10","25","50"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+
+
+
+#De acuerdo al análisis anterior se utilizarán los métodos con los siguientes parámetros
+
+#Bayes - Lapace=0
+#SVM - kernel="linear"
+#Arbol - control=rpart.control(maxdepth=15)
+#Forest  -ntree=500
+#ADA boosting - type="Discrete"
+#Redes Neuronales - size=9
+#K-vecinos - kmax=25
+
+plot(deteccion.mayor.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.mayor.laplace.0,deteccion.mayor.lineal,deteccion.mayor.arbol.2,deteccion.mayor.bosques.500,deteccion.mayor.discrete,deteccion.mayor.redes.3,deteccion.mayor.k.25)-5, max(deteccion.mayor.laplace.0,deteccion.mayor.lineal,deteccion.mayor.arbol.2,deteccion.mayor.bosques.500,deteccion.mayor.real,deteccion.mayor.redes.3,deteccion.mayor.k.25)+5), main = "Detección de ingreso >50K", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+points(deteccion.mayor.lineal, col = "blue", type = "b")
+points(deteccion.mayor.arbol.2, col = "red", type = "b")
+points(deteccion.mayor.bosques.500, col = "cyan", type = "b")
+points(deteccion.mayor.discrete, col = "magenta", type = "b")
+points(deteccion.mayor.redes.3, col = "orange", type = "b")
+points(deteccion.mayor.k.25, col = "grey", type = "b")
+legend("bottomright", legend = c("Bayes","SVM","Arbol","Forest","ADA","Redes N.","K-vecinos"), col = c("green", 
+    "blue","red","cyan","magenta","orange","grey"), lty = 1, lwd = 1)
+```
+Aunque es difícil determinar los tres mejores modelos, se puede decir a partir de la gráfica que son: K-vecinos, Ada boosting y Arboles.
+
+
+####b) Errores globales
+```{r,fig.align='center'}
+n <- dim(tmuestra)[1]
+
+#Selección del mejor método de Bayes 
+#Según lo indicado en http://www.learnbymarketing.com/tutorials/naive-bayes-in-r/ se va a variar el parámetro Laplace para ver si tiene algún efecto.
+
+deteccion.error.laplace.0<-rep(0,6)
+deteccion.error.laplace.1<-rep(0,6)
+deteccion.error.laplace.3<-rep(0,6)
+
+# Validación cruzada 6 veces
+for(i in 1:6) {
+  grupos <- createFolds(1:n,5)
+  error.laplace.0<-0
+  error.laplace.1<-0
+  error.laplace.3<-0
+
+  for(k in 1:5) {    
+      muestra <- grupos[[k]]
+      ttesting <- tmuestra[muestra,]
+      taprendizaje <- tmuestra[-muestra,]
+      
+      modelo <- naiveBayes(Income~.,data=taprendizaje,laplace=0)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.laplace.0<-error.laplace.0+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- naiveBayes(Income~.,data=taprendizaje,laplace=1)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.laplace.1<-error.laplace.1+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- naiveBayes(Income~.,data=taprendizaje,laplace=3)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.laplace.3<-error.laplace.3+(1-(sum(diag(MC)))/sum(MC))*100    
+  }
+  
+   deteccion.error.laplace.0[i]<-error.laplace.0/5
+   deteccion.error.laplace.1[i]<-error.laplace.1/5
+   deteccion.error.laplace.3[i]<-error.laplace.3/5
+
+}
+
+plot(deteccion.error.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.error.laplace.0, deteccion.error.laplace.1, deteccion.error.laplace.3)-5, max(deteccion.error.laplace.0, deteccion.error.laplace.1, deteccion.error.laplace.3)+5), main = "Detección del ERROR", xlab = "Número de iteración", ylab = "ERROR cometido")
+points(deteccion.error.laplace.1, col = "blue", type = "b")
+points(deteccion.error.laplace.3, col = "red", type = "b")
+legend("topright", legend = c("Laplace 0","Laplace 1","Laplace 3"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+
+
+
+
+#Selección del mejor método de SVM
+
+deteccion.error.radial<-rep(0,6)
+deteccion.error.lineal<-rep(0,6)
+deteccion.error.polynomial<-rep(0,6)
+deteccion.error.sigmoid<-rep(0,6)
+
+# Validación cruzada 6 veces
+for(i in 1:6) {
+  grupos <- createFolds(1:n,5)
+  error.radial<-0
+  error.lineal<-0
+  error.polynomial<-0
+  error.sigmoid<-0
+
+  for(k in 1:5) {    
+      muestra <- grupos[[k]]
+      ttesting <- tmuestra[muestra,]
+      taprendizaje <- tmuestra[-muestra,]
+      
+      modelo <- svm(Income~.,data=taprendizaje,kernel="radial")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.radial<-error.radial+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- svm(Income~.,data=taprendizaje,kernel="linear")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.lineal<-error.lineal+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- svm(Income~.,data=taprendizaje,kernel="polynomial")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.polynomial<-error.polynomial+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- svm(Income~.,data=taprendizaje,kernel="sigmoid")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.sigmoid<-error.sigmoid+(1-(sum(diag(MC)))/sum(MC))*100
+  }
+  
+   deteccion.error.radial[i]<-error.radial/5
+   deteccion.error.lineal[i]<-error.lineal/5
+   deteccion.error.polynomial[i]<-error.polynomial/5
+   deteccion.error.sigmoid[i]<-error.sigmoid/5
+
+}
+
+plot(deteccion.error.radial, col = "green", type = "b",  ylim = c(min(deteccion.error.radial,deteccion.error.lineal,deteccion.error.polynomial,deteccion.error.sigmoid)-5, max(deteccion.error.radial,deteccion.error.lineal,deteccion.error.polynomial,deteccion.error.sigmoid)+5), main = "Detección del ERROR - SVM", xlab = "Número de iteración", ylab = "Error cometido")
+points(deteccion.error.lineal, col = "blue", type = "b")
+points(deteccion.error.polynomial, col = "red", type = "b")
+points(deteccion.error.sigmoid, col = "cyan", type = "b")
+legend("topright", legend = c("Radial","Lineal","Polynomial","Sigmoid"), col = c("green", 
+    "blue","red","cyan"), lty = 1, lwd = 1)
+
+
+
+
+
+#Selección del mejor método de Arbol
+#Se va a variar el parámetro maxdepth (Profundidad Máxima)
+
+deteccion.error.arbol.1<-rep(0,6)
+deteccion.error.arbol.2<-rep(0,6)
+deteccion.error.arbol.3<-rep(0,6)
+
+# Validación cruzada 6 veces
+for(i in 1:6) {
+  grupos <- createFolds(1:n,5)
+  error.arbol.1<-0
+  error.arbol.2<-0
+  error.arbol.3<-0
+
+  for(k in 1:5) {    
+      muestra <- grupos[[k]]
+      ttesting <- tmuestra[muestra,]
+      taprendizaje <- tmuestra[-muestra,]
+      
+      modelo <- rpart(Income~.,data=taprendizaje,control=rpart.control(maxdepth=5))
+      prediccion <- predict(modelo,ttesting,type='class')
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.arbol.1<-error.arbol.1+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- rpart(Income~.,data=taprendizaje,control=rpart.control(maxdepth=15))
+      prediccion <- predict(modelo,ttesting,type='class')
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.arbol.2<-error.arbol.2+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- rpart(Income~.,data=taprendizaje,control=rpart.control(maxdepth=25))
+      prediccion <- predict(modelo,ttesting,type='class')
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.arbol.3<-error.arbol.3+(1-(sum(diag(MC)))/sum(MC))*100
+  }
+  
+   deteccion.error.arbol.1[i]<-error.arbol.1/5
+   deteccion.error.arbol.2[i]<-error.arbol.2/5
+   deteccion.error.arbol.3[i]<-error.arbol.3/5
+}
+
+plot(deteccion.error.arbol.1, col = "green", type = "b",  ylim = c(min(deteccion.error.arbol.1,deteccion.error.arbol.2,deteccion.error.arbol.3)-5, max(deteccion.error.arbol.1,deteccion.error.arbol.2,deteccion.error.arbol.3)+5), main = "Detección del ERROR - Arbol", xlab = "Número de iteración", ylab = "Error cometido")
+points(deteccion.error.arbol.2, col = "blue", type = "b")
+points(deteccion.error.arbol.3, col = "red", type = "b")
+legend("topright", legend = c("5","15","25"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+
+
+
+
+#Selección del mejor método de Bosques
+#Se va a variar el parámetro ntree (Número de árboles)
+
+
+deteccion.error.bosques.500<-rep(0,6)
+deteccion.error.bosques.750<-rep(0,6)
+deteccion.error.bosques.1000<-rep(0,6)
+
+# Validación cruzada 6 veces
+for(i in 1:6) {
+  grupos <- createFolds(1:n,5)
+  error.bosques.500<-0
+  error.bosques.750<-0
+  error.bosques.1000<-0
+
+  for(k in 1:5) {    
+      muestra <- grupos[[k]]
+      ttesting <- tmuestra[muestra,]
+      taprendizaje <- tmuestra[-muestra,]
+      
+      modelo <- randomForest(Income~.,data=taprendizaje,importance=TRUE,ntree=500)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.bosques.500<-error.bosques.500+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- randomForest(Income~.,data=taprendizaje,importance=TRUE,ntree=750)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.bosques.750<-error.bosques.750+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- randomForest(Income~.,data=taprendizaje,importance=TRUE,ntree=1000)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.bosques.1000<-error.bosques.1000+(1-(sum(diag(MC)))/sum(MC))*100
+  }
+  
+   deteccion.error.bosques.500[i]<-error.bosques.500/5
+   deteccion.error.bosques.750[i]<-error.bosques.750/5
+   deteccion.error.bosques.1000[i]<-error.bosques.1000/5
+}
+
+plot(deteccion.error.bosques.500, col = "green", type = "b",  ylim = c(min(deteccion.error.bosques.500,deteccion.error.bosques.750,deteccion.error.bosques.1000)-5, max(deteccion.error.bosques.500,deteccion.error.bosques.750,deteccion.error.bosques.1000)+5), main = "Detección del ERROR - Bosques", xlab = "Número de iteración", ylab = "Error cometido")
+points(deteccion.error.bosques.750, col = "blue", type = "b")
+points(deteccion.error.bosques.1000, col = "red", type = "b")
+legend("topright", legend = c("500","750","1000"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+
+
+
+#Selección del mejor método de Redes Neuronales
+#Se va a variar el parámetro size (Número de capas ocultas)
+
+deteccion.error.redes.1<-rep(0,6)
+deteccion.error.redes.2<-rep(0,6)
+deteccion.error.redes.3<-rep(0,6)
+
+# Validación cruzada 6 veces
+for(i in 1:6) {
+  grupos <- createFolds(1:n,5)
+  error.redes.1<-0
+  error.redes.2<-0
+  error.redes.3<-0
+
+  for(k in 1:5) {    
+      muestra <- grupos[[k]]
+      ttesting <- tmuestra[muestra,]
+      taprendizaje <- tmuestra[-muestra,]
+      
+      modelo <- nnet(Income~.,data=taprendizaje,size = 5, rang = 0.1,decay = 5e-4, maxit = 100,trace=FALSE)
+      prediccion <- predict(modelo,ttesting[,-15],type="class")
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      if (dim(MC)[2]==1){
+      MC<-cbind(MC,c(0,0))
+      }
+      error.redes.1<-error.redes.1+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- nnet(Income~.,data=taprendizaje,size = 7, rang = 0.1,decay = 5e-4, maxit = 100,trace=FALSE)
+      prediccion <- predict(modelo,ttesting[,-15],type="class")
+      Actual<-ttesting[,15]
+      MC<-cbind(table(Actual,prediccion),c(0,0))
+      if (dim(MC)[2]==1){
+      MC<-cbind(MC,c(0,0))
+      }
+      error.redes.2<-error.redes.2+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- nnet(Income~.,data=taprendizaje,size = 9, rang = 0.1,decay = 5e-4, maxit = 100,trace=FALSE)
+      prediccion <- predict(modelo,ttesting[,-15],type="class")
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      if (dim(MC)[2]==1){
+      MC<-cbind(MC,c(0,0))
+      }
+      error.redes.3<-error.redes.3+(1-(sum(diag(MC)))/sum(MC))*100
+  }
+  
+   deteccion.error.redes.1[i]<-error.redes.1/5
+   deteccion.error.redes.2[i]<-error.redes.2/5
+   deteccion.error.redes.3[i]<-error.redes.3/5
+}
+
+plot(deteccion.error.redes.1, col = "green", type = "b",  ylim = c(min(deteccion.error.redes.1,deteccion.error.redes.2,deteccion.error.redes.3)-5, max(deteccion.error.redes.1,deteccion.error.redes.2,deteccion.error.redes.3)+5), main = "Detección del ERROR - Redes Neuronales", xlab = "Número de iteración", ylab = "Error cometido")
+points(deteccion.error.redes.2, col = "blue", type = "b")
+points(deteccion.error.redes.3, col = "red", type = "b")
+legend("topright", legend = c("5","7","9"), col = c("green","blue","red"), lty = 1, lwd = 1)
+
+
+
+
+
+
+#Selección del mejor método de K-vecinos
+
+deteccion.error.k.10<-rep(0,6)
+deteccion.error.k.25<-rep(0,6)
+deteccion.error.k.50<-rep(0,6)
+
+# Validación cruzada 6 veces
+for(i in 1:6) {
+  grupos <- createFolds(1:n,5)
+  error.k.10<-0
+  error.k.25<-0
+  error.k.50<-0
+
+
+  for(k in 1:5) {    
+      muestra <- grupos[[k]]
+      ttesting <- tmuestra[muestra,]
+      taprendizaje <- tmuestra[-muestra,]
+      
+      modelo <- train.kknn(Income~.,data=taprendizaje,kmax=10)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.k.10<-error.k.10+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- train.kknn(Income~.,data=taprendizaje,kmax=25)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.k.25<-error.k.25+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- train.kknn(Income~.,data=taprendizaje,kmax=50)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,15]
+      MC<-table(Actual,prediccion)
+      error.k.50<-error.k.50+(1-(sum(diag(MC)))/sum(MC))*100
+  }
+  
+   deteccion.error.k.10[i]<-error.k.10/5
+   deteccion.error.k.25[i]<-error.k.25/5
+   deteccion.error.k.50[i]<-error.k.10/5
+
+}
+
+plot(deteccion.error.k.10, col = "green", type = "b",  ylim = c(min(deteccion.error.k.10,deteccion.error.k.25,deteccion.error.k.50)-5, max(deteccion.error.k.10,deteccion.error.k.25,deteccion.error.k.50)+5), main = "Detección del ERROR - K-vecinos", xlab = "Número de iteración", ylab = "Error cometido")
+points(deteccion.error.k.25, col = "blue", type = "b")
+points(deteccion.error.k.50, col = "red", type = "b")
+legend("topright", legend = c("10","25","50"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+
+
+
+#De acuerdo al análisis anterior se utilizarán los métodos con los siguientes parámetros
+
+#Bayes - Lapace=0
+#SVM - kernel="linear"
+#Arbol - control=rpart.control(maxdepth=15)
+#Forest  -ntree=500
+#ADA boosting - type="Discrete"
+#Redes Neuronales - size=9
+#K-vecinos - kmax=25
+
+plot(deteccion.error.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.error.laplace.0,deteccion.error.lineal,deteccion.error.arbol.2,deteccion.error.bosques.500,deteccion.error.discrete,deteccion.error.redes.3,deteccion.error.k.25)-5, max(deteccion.error.laplace.0,deteccion.error.lineal,deteccion.error.arbol.2,deteccion.error.bosques.500,deteccion.error.real,deteccion.error.redes.3,deteccion.error.k.25)+5), main = "Detección del ERROR", xlab = "Número de iteración", ylab = "Error cometido")
+points(deteccion.error.lineal, col = "blue", type = "b")
+points(deteccion.error.arbol.2, col = "red", type = "b")
+points(deteccion.error.bosques.500, col = "cyan", type = "b")
+points(deteccion.error.discrete, col = "magenta", type = "b")
+points(deteccion.error.redes.3, col = "orange", type = "b")
+points(deteccion.error.k.25, col = "grey", type = "b")
+legend("topright", legend = c("Bayes","SVM","Arbol","Forest","ADA","Redes N.","K-vecinos"), col = c("green","blue","red","cyan","magenta","orange","grey"), lty = 1, lwd = 1)
+```
+Aunque es difícil detrminar los tres mejores modelos, se puede decir a partir de la gráfica que son: Bayes, SVM, Arbol.
+
+
+####c) Errores globales
+De acuerdo a lo anterior utilizaría el método de SVM ya que minimiza bastante bien el error global y tiene poca variación a lo largo de las 6 variaciones cruzadas. 
+
+
+
+###**Ejercicio 4**
+
+#### Carga de datos
+Debido a lo desbalanceado del problema se va a hacer uso de toda la tabla de datos para la selección y caliubración del modelo.
+```{r}
+datos4 <- read.csv("SegurosV2016.csv", header=TRUE, sep=";", dec=",")
+str(datos4)
+#Dimensión de la tabla original
+summary(datos4$Fraude)
+#Proporción de la tabla original
+prop.table(summary(datos4$Fraude))
+
+```
+
+
+####Calibración de los métodos
+```{r,fig.align='center'}
+n <- dim(datos4)[1]
+
+deteccion.mayor.laplace.0<-rep(0,6)
+deteccion.mayor.laplace.1<-rep(0,6)
+deteccion.mayor.laplace.3<-rep(0,6)
+deteccion.mayor.radial<-rep(0,6)
+deteccion.mayor.lineal<-rep(0,6)
+deteccion.mayor.polynomial<-rep(0,6)
+deteccion.mayor.sigmoid<-rep(0,6)
+deteccion.mayor.arbol.1<-rep(0,6)
+deteccion.mayor.arbol.2<-rep(0,6)
+deteccion.mayor.arbol.3<-rep(0,6)
+deteccion.mayor.bosques.500<-rep(0,6)
+deteccion.mayor.bosques.750<-rep(0,6)
+deteccion.mayor.bosques.1000<-rep(0,6)
+deteccion.mayor.redes.1<-rep(0,6)
+deteccion.mayor.redes.2<-rep(0,6)
+deteccion.mayor.redes.3<-rep(0,6)
+deteccion.mayor.k.10<-rep(0,6)
+deteccion.mayor.k.25<-rep(0,6)
+deteccion.mayor.k.50<-rep(0,6)
+deteccion.mayor.discrete<-rep(0,6)
+deteccion.mayor.real<-rep(0,6)  
+deteccion.mayor.gentle<-rep(0,6)
+deteccion.error.laplace.0<-rep(0,6)
+deteccion.error.laplace.1<-rep(0,6)
+deteccion.error.laplace.3<-rep(0,6)
+deteccion.error.radial<-rep(0,6)
+deteccion.error.lineal<-rep(0,6)
+deteccion.error.polynomial<-rep(0,6)
+deteccion.error.sigmoid<-rep(0,6)
+deteccion.error.arbol.1<-rep(0,6)
+deteccion.error.arbol.2<-rep(0,6)
+deteccion.error.arbol.3<-rep(0,6)
+deteccion.error.bosques.500<-rep(0,6)
+deteccion.error.bosques.750<-rep(0,6)
+deteccion.error.bosques.1000<-rep(0,6)
+deteccion.error.redes.1<-rep(0,6)
+deteccion.error.redes.2<-rep(0,6)
+deteccion.error.redes.3<-rep(0,6)
+deteccion.error.k.10<-rep(0,6)
+deteccion.error.k.25<-rep(0,6)
+deteccion.error.k.50<-rep(0,6)
+deteccion.error.discrete<-rep(0,6)
+deteccion.error.real<-rep(0,6)
+deteccion.error.gentle<-rep(0,6)
+
+
+
+
+# Validación cruzada 6 veces
+for(i in 1:6) {
+  grupos <- createFolds(1:n,5)
+  mayor.laplace.0<-0
+  mayor.laplace.1<-0
+  mayor.laplace.3<-0
+  mayor.radial<-0
+  mayor.lineal<-0
+  mayor.polynomial<-0
+  mayor.sigmoid<-0
+  mayor.arbol.1<-0
+  mayor.arbol.2<-0
+  mayor.arbol.3<-0
+  mayor.bosques.500<-0
+  mayor.bosques.750<-0
+  mayor.bosques.1000<-0
+  mayor.redes.1<-0
+  mayor.redes.2<-0
+  mayor.redes.3<-0
+  mayor.k.10<-0
+  mayor.k.25<-0
+  mayor.k.50<-0
+  mayor.discrete<-0
+  mayor.real<-0
+  mayor.gentle<-0
+  error.laplace.0<-0
+  error.laplace.1<-0
+  error.laplace.3<-0
+  error.radial<-0
+  error.lineal<-0
+  error.polynomial<-0
+  error.sigmoid<-0
+  error.arbol.1<-0
+  error.arbol.2<-0
+  error.arbol.3<-0
+  error.bosques.500<-0
+  error.bosques.750<-0
+  error.bosques.1000<-0
+  error.redes.1<-0
+  error.redes.2<-0
+  error.redes.3<-0
+  error.k.10<-0
+  error.k.25<-0
+  error.k.50<-0
+  error.discrete<-0
+  error.real<-0
+  error.gentle<-0
+
+  
+  
+
+  for(k in 1:5) {    
+      muestra <- grupos[[k]]
+      ttesting <- datos4[muestra,]
+      taprendizaje <- datos4[-muestra,]
+      
+      modelo <- naiveBayes(Fraude~.,data=taprendizaje,laplace=0)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.laplace.0<- mayor.laplace.0+MC[2,2]
+      error.laplace.0<-error.laplace.0+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- naiveBayes(Fraude~.,data=taprendizaje,laplace=1)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.laplace.1<- mayor.laplace.1+MC[2,2]
+      error.laplace.1<-error.laplace.1+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- naiveBayes(Fraude~.,data=taprendizaje,laplace=3)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.laplace.3<- mayor.laplace.3+MC[2,2]  
+      error.laplace.3<-error.laplace.3+(1-(sum(diag(MC)))/sum(MC))*100    
+      
+      modelo <- svm(Fraude~.,data=taprendizaje,kernel="radial")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.radial<- mayor.radial+MC[2,2]
+      error.radial<-error.radial+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- svm(Fraude~.,data=taprendizaje,kernel="linear")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.lineal<- mayor.lineal+MC[2,2]
+      error.lineal<-error.lineal+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- svm(Fraude~.,data=taprendizaje,kernel="polynomial")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.polynomial<- mayor.polynomial+MC[2,2]  
+      error.polynomial<-error.polynomial+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- svm(Fraude~.,data=taprendizaje,kernel="sigmoid")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.sigmoid<- mayor.sigmoid+MC[2,2]
+      error.sigmoid<-error.sigmoid+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- rpart(Fraude~.,data=taprendizaje,control=rpart.control(maxdepth=5))
+      prediccion <- predict(modelo,ttesting,type='class')
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.arbol.1<- mayor.arbol.1+MC[2,2]
+      error.arbol.1<-error.arbol.1+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- rpart(Fraude~.,data=taprendizaje,control=rpart.control(maxdepth=15))
+      prediccion <- predict(modelo,ttesting,type='class')
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.arbol.2<- mayor.arbol.2+MC[2,2]
+      error.arbol.2<-error.arbol.2+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- rpart(Fraude~.,data=taprendizaje,control=rpart.control(maxdepth=25))
+      prediccion <- predict(modelo,ttesting,type='class')
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.arbol.3<- mayor.arbol.3+MC[2,2]
+      error.arbol.3<-error.arbol.3+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- randomForest(Fraude~.,data=taprendizaje,importance=TRUE,ntree=500)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.bosques.500<- mayor.bosques.500+MC[2,2]
+      error.bosques.500<-error.bosques.500+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- randomForest(Fraude~.,data=taprendizaje,importance=TRUE,ntree=750)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.bosques.750<- mayor.bosques.750+MC[2,2]
+      error.bosques.750<-error.bosques.750+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- randomForest(Fraude~.,data=taprendizaje,importance=TRUE,ntree=1000)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.bosques.1000<- mayor.bosques.1000+MC[2,2]
+      error.bosques.1000<-error.bosques.1000+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- nnet(Fraude~.,data=taprendizaje,size = 5, rang = 0.1,decay = 5e-4, maxit = 100,trace=FALSE)
+      prediccion <- predict(modelo,ttesting[,-15],type="class")
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      if (dim(MC)[2]==1){
+      MC<-cbind(MC,c(0,0))
+      }
+      mayor.redes.1<- mayor.redes.1+MC[2,2]
+      error.redes.1<-error.redes.1+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- nnet(Fraude~.,data=taprendizaje,size = 7, rang = 0.1,decay = 5e-4, maxit = 100,trace=FALSE)
+      prediccion <- predict(modelo,ttesting[,-15],type="class")
+      Actual<-ttesting[,12]
+      MC<-cbind(table(Actual,prediccion),c(0,0))
+      if (dim(MC)[2]==1){
+      MC<-cbind(MC,c(0,0))
+      }
+      mayor.redes.2<- mayor.redes.2+MC[2,2]
+      error.redes.2<-error.redes.2+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- nnet(Fraude~.,data=taprendizaje,size = 9, rang = 0.1,decay = 5e-4, maxit = 100,trace=FALSE)
+      prediccion <- predict(modelo,ttesting[,-15],type="class")
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      if (dim(MC)[2]==1){
+      MC<-cbind(MC,c(0,0))
+      }
+      mayor.redes.3<- mayor.redes.3+MC[2,2]
+      error.redes.3<-error.redes.3+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- train.kknn(Fraude~.,data=taprendizaje,kmax=2)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.k.10<- mayor.k.10+MC[2,2]
+      error.k.10<-error.k.10+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- train.kknn(Fraude~.,data=taprendizaje,kmax=10)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.k.25<- mayor.k.25+MC[2,2]
+      error.k.25<-error.k.25+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo <- train.kknn(Fraude~.,data=taprendizaje,kmax=15)
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.k.50<- mayor.k.50+MC[2,2]
+      error.k.50<-error.k.50+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo<-ada(Fraude~.,data=taprendizaje,iter=60,nu=1,type="discrete")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.discrete<- mayor.discrete+MC[2,2]
+      error.discrete<-error.discrete+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo<-ada(Fraude~.,data=taprendizaje,iter=60,nu=1,type="real")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.real<- mayor.real+MC[2,2]
+      error.real<-error.real+(1-(sum(diag(MC)))/sum(MC))*100
+      
+      modelo<-ada(Fraude~.,data=taprendizaje,iter=60,nu=1,type="gentle")
+      prediccion <- predict(modelo,ttesting)
+      Actual<-ttesting[,12]
+      MC<-table(Actual,prediccion)
+      mayor.gentle<- mayor.gentle+MC[2,2]      
+      error.gentle<-error.gentle+(1-(sum(diag(MC)))/sum(MC))*100    
+      
+  }
+  
+   deteccion.mayor.laplace.0[i]<-mayor.laplace.0
+   deteccion.mayor.laplace.1[i]<-mayor.laplace.1
+   deteccion.mayor.laplace.3[i]<-mayor.laplace.3
+   deteccion.mayor.radial[i]<-mayor.radial
+   deteccion.mayor.lineal[i]<-mayor.lineal
+   deteccion.mayor.polynomial[i]<-mayor.polynomial
+   deteccion.mayor.sigmoid[i]<-mayor.sigmoid
+   deteccion.mayor.arbol.1[i]<-mayor.arbol.1
+   deteccion.mayor.arbol.2[i]<-mayor.arbol.2
+   deteccion.mayor.arbol.3[i]<-mayor.arbol.3
+   deteccion.mayor.bosques.500[i]<-mayor.bosques.500
+   deteccion.mayor.bosques.750[i]<-mayor.bosques.750
+   deteccion.mayor.bosques.1000[i]<-mayor.bosques.1000
+   deteccion.mayor.redes.1[i]<-mayor.redes.1
+   deteccion.mayor.redes.2[i]<-mayor.redes.2
+   deteccion.mayor.redes.3[i]<-mayor.redes.3
+   deteccion.mayor.k.10[i]<-mayor.k.10
+   deteccion.mayor.k.25[i]<-mayor.k.25
+   deteccion.mayor.k.50[i]<-mayor.k.50
+   deteccion.mayor.discrete[i]<-mayor.discrete
+   deteccion.mayor.real[i]<-mayor.real
+   deteccion.mayor.gentle[i]<-mayor.gentle
+   deteccion.error.laplace.0[i]<-error.laplace.0/5
+   deteccion.error.laplace.1[i]<-error.laplace.1/5
+   deteccion.error.laplace.3[i]<-error.laplace.3/5
+   deteccion.error.radial[i]<-error.radial/5
+   deteccion.error.lineal[i]<-error.lineal/5
+   deteccion.error.polynomial[i]<-error.polynomial/5
+   deteccion.error.sigmoid[i]<-error.sigmoid/5
+   deteccion.error.arbol.1[i]<-error.arbol.1/5
+   deteccion.error.arbol.2[i]<-error.arbol.2/5
+   deteccion.error.arbol.3[i]<-error.arbol.3/5
+   deteccion.error.bosques.500[i]<-error.bosques.500/5
+   deteccion.error.bosques.750[i]<-error.bosques.750/5
+   deteccion.error.bosques.1000[i]<-error.bosques.1000/5
+   deteccion.error.redes.1[i]<-error.redes.1/5
+   deteccion.error.redes.2[i]<-error.redes.2/5
+   deteccion.error.redes.3[i]<-error.redes.3/5
+   deteccion.error.k.10[i]<-error.k.10/5
+   deteccion.error.k.25[i]<-error.k.25/5
+   deteccion.error.k.50[i]<-error.k.50/5
+   deteccion.error.discrete[i]<-error.discrete/5
+   deteccion.error.real[i]<-error.real/5
+   deteccion.error.gentle[i]<-error.gentle/5
+
+  
+}
+
+```
+
+
+
+```{r,fig.align='center'}
+plot(deteccion.mayor.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.mayor.laplace.0, deteccion.mayor.laplace.1, deteccion.mayor.laplace.3)-5, max(deteccion.mayor.laplace.0, deteccion.mayor.laplace.1, deteccion.mayor.laplace.3)+5), main = "Detección de fraude", xlab = "Número de iteración", ylab = "Cantidad de fraudes detectados")
+points(deteccion.mayor.laplace.1, col = "blue", type = "b")
+points(deteccion.mayor.laplace.3, col = "red", type = "b")
+legend("topright", legend = c("Laplace 0","Laplace 1","Laplace 3"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+plot(deteccion.mayor.radial, col = "green", type = "b",  ylim = c(min(deteccion.mayor.radial,deteccion.mayor.lineal,deteccion.mayor.polynomial,deteccion.mayor.sigmoid)-5, max(deteccion.mayor.radial,deteccion.mayor.lineal,deteccion.mayor.polynomial,deteccion.mayor.sigmoid)+5), main = "Detección de fraude - SVM", xlab = "Número de iteración", ylab = "Cantidad de fraudes detectados")
+points(deteccion.mayor.lineal, col = "blue", type = "b")
+points(deteccion.mayor.polynomial, col = "red", type = "b")
+points(deteccion.mayor.sigmoid, col = "cyan", type = "b")
+legend("topright", legend = c("Radial","Lineal","Polynomial","Sigmoid"), col = c("green", 
+    "blue","red","cyan"), lty = 1, lwd = 1)
+
+plot(deteccion.mayor.arbol.1, col = "green", type = "b",  ylim = c(min(deteccion.mayor.arbol.1,deteccion.mayor.arbol.2,deteccion.mayor.arbol.3)-5, max(deteccion.mayor.arbol.1,deteccion.mayor.arbol.2,deteccion.mayor.arbol.3)+5), main = "Detección de fraude - Arbol", xlab = "Número de iteración", ylab = "Cantidad de fraudes detectados")
+points(deteccion.mayor.arbol.2, col = "blue", type = "b")
+points(deteccion.mayor.arbol.3, col = "red", type = "b")
+legend("topright", legend = c("5","15","25"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+plot(deteccion.mayor.bosques.500, col = "green", type = "b",  ylim = c(min(deteccion.mayor.bosques.500,deteccion.mayor.bosques.750,deteccion.mayor.bosques.1000)-5, max(deteccion.mayor.bosques.500,deteccion.mayor.bosques.750,deteccion.mayor.bosques.1000)+5), main = "Detección de fraude - Bosques", xlab = "Número de iteración", ylab = "Cantidad de fraudes detectados")
+points(deteccion.mayor.bosques.750, col = "blue", type = "b")
+points(deteccion.mayor.bosques.1000, col = "red", type = "b")
+legend("topright", legend = c("500","750","1000"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+plot(deteccion.mayor.redes.1, col = "green", type = "b",  ylim = c(min(deteccion.mayor.redes.1,deteccion.mayor.redes.2,deteccion.mayor.redes.3)-5, max(deteccion.mayor.redes.1,deteccion.mayor.redes.2,deteccion.mayor.redes.3)+5), main = "Detección de fraude - Redes Neuronales", xlab = "Número de iteración", ylab = "Cantidad de fraudes detectados")
+points(deteccion.mayor.redes.2, col = "blue", type = "b")
+points(deteccion.mayor.redes.3, col = "red", type = "b")
+legend("topright", legend = c("5","7","9"), col = c("green","blue","red"), lty = 1, lwd = 1)
+
+plot(deteccion.mayor.k.10, col = "green", type = "b",  ylim = c(min(deteccion.mayor.k.10,deteccion.mayor.k.25,deteccion.mayor.k.50)-5, max(deteccion.mayor.k.10,deteccion.mayor.k.25,deteccion.mayor.k.50)+5), main = "Detección de fraude - K-vecinos", xlab = "Número de iteración", ylab = "Cantidad de fraudes detectados")
+points(deteccion.mayor.k.25, col = "blue", type = "b")
+points(deteccion.mayor.k.50, col = "red", type = "b")
+legend("topright", legend = c("10","25","50"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+plot(deteccion.mayor.discrete, col = "green", type = "b",  ylim = c(min(deteccion.mayor.discrete, deteccion.mayor.real, deteccion.mayor.gentle)-5, max(deteccion.mayor.discrete, deteccion.mayor.real, deteccion.mayor.gentle)+10), main = "Detección de fraude - ada boosting", xlab = "Número de iteración", ylab = "Cantidad de fraudes detectados")
+points(deteccion.mayor.real, col = "blue", type = "b")
+points(deteccion.mayor.gentle, col = "red", type = "b")
+legend("topright", legend = c("Discrete","Real","Gentle"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+
+
+
+plot(deteccion.error.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.error.laplace.0, deteccion.error.laplace.1, deteccion.error.laplace.3)-5, max(deteccion.error.laplace.0, deteccion.error.laplace.1, deteccion.error.laplace.3)+5), main = "Detección del ERROR", xlab = "Número de iteración", ylab = "ERROR cometido")
+points(deteccion.error.laplace.1, col = "blue", type = "b")
+points(deteccion.error.laplace.3, col = "red", type = "b")
+legend("topright", legend = c("Laplace 0","Laplace 1","Laplace 3"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+plot(deteccion.error.radial, col = "green", type = "b",  ylim = c(min(deteccion.error.radial,deteccion.error.lineal,deteccion.error.polynomial,deteccion.error.sigmoid)-5, max(deteccion.error.radial,deteccion.error.lineal,deteccion.error.polynomial,deteccion.error.sigmoid)+5), main = "Detección del ERROR - SVM", xlab = "Número de iteración", ylab = "Error cometido")
+points(deteccion.error.lineal, col = "blue", type = "b")
+points(deteccion.error.polynomial, col = "red", type = "b")
+points(deteccion.error.sigmoid, col = "cyan", type = "b")
+legend("topright", legend = c("Radial","Lineal","Polynomial","Sigmoid"), col = c("green", 
+    "blue","red","cyan"), lty = 1, lwd = 1)
+
+plot(deteccion.error.arbol.1, col = "green", type = "b",  ylim = c(min(deteccion.error.arbol.1,deteccion.error.arbol.2,deteccion.error.arbol.3)-5, max(deteccion.error.arbol.1,deteccion.error.arbol.2,deteccion.error.arbol.3)+5), main = "Detección del ERROR - Arbol", xlab = "Número de iteración", ylab = "Error cometido")
+points(deteccion.error.arbol.2, col = "blue", type = "b")
+points(deteccion.error.arbol.3, col = "red", type = "b")
+legend("topright", legend = c("5","15","25"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+plot(deteccion.error.bosques.500, col = "green", type = "b",  ylim = c(min(deteccion.error.bosques.500,deteccion.error.bosques.750,deteccion.error.bosques.1000)-5, max(deteccion.error.bosques.500,deteccion.error.bosques.750,deteccion.error.bosques.1000)+5), main = "Detección del ERROR - Bosques", xlab = "Número de iteración", ylab = "Error cometido")
+points(deteccion.error.bosques.750, col = "blue", type = "b")
+points(deteccion.error.bosques.1000, col = "red", type = "b")
+legend("topright", legend = c("500","750","1000"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+plot(deteccion.error.redes.1, col = "green", type = "b",  ylim = c(min(deteccion.error.redes.1,deteccion.error.redes.2,deteccion.error.redes.3)-5, max(deteccion.error.redes.1,deteccion.error.redes.2,deteccion.error.redes.3)+5), main = "Detección del ERROR - Redes Neuronales", xlab = "Número de iteración", ylab = "Error cometido")
+points(deteccion.error.redes.2, col = "blue", type = "b")
+points(deteccion.error.redes.3, col = "red", type = "b")
+legend("topright", legend = c("5","7","9"), col = c("green","blue","red"), lty = 1, lwd = 1)
+
+plot(deteccion.error.k.10, col = "green", type = "b",  ylim = c(min(deteccion.error.k.10,deteccion.error.k.25,deteccion.error.k.50)-5, max(deteccion.error.k.10,deteccion.error.k.25,deteccion.error.k.50)+5), main = "Detección del ERROR - K-vecinos", xlab = "Número de iteración", ylab = "Error cometido")
+points(deteccion.error.k.25, col = "blue", type = "b")
+points(deteccion.error.k.50, col = "red", type = "b")
+legend("topright", legend = c("10","25","50"), col = c("green", 
+    "blue","red"), lty = 1, lwd = 1)
+
+plot(deteccion.error.discrete, col = "green", type = "b",  ylim = c(min(deteccion.error.discrete, deteccion.error.real, deteccion.error.gentle), max(deteccion.error.discrete, deteccion.error.real, deteccion.error.gentle)+1), main = "Detección del ERROR - ada boosting", xlab = "Número de iteración", ylab = "ERROR Cometido")
+points(deteccion.error.real, col = "blue", type = "b")
+points(deteccion.error.gentle, col = "red", type = "b")
+
+legend("topright", legend = c("Discrete","Real","Gentle"), col = c("green","blue","red"), lty = 1, lwd = 2)
+
+```
+
+Se va a usar el modelo de Bayes que dio un mejor resultado durante la calibración.
+```{r, warning=FALSE}
+datos5 <- read.csv("SegurosNuevos500V2016VE.csv", header=TRUE, sep=";", dec=",")
+modelo.bayes <- naiveBayes(Fraude~.,data=datos4,laplace=0)
+Fraude <- predict(modelo.bayes,datos5)
+datos5 <- cbind(datos5[,1:11],Fraude)
+write.csv(datos5,"RetoAcuna.csv", row.names=TRUE, sep=";")
+end.time <- Sys.time()
+time.taken <- round(end.time - start.time,2)
+time.taken
+```
+
