@@ -1,6 +1,6 @@
 ---
-title: "Tarea2 - Métodos avanzados en minería de datos"
-author: "Pablo Acuña Quirós"
+title: "Tarea2 - MÃ©todos avanzados en minerÃ­a de datos"
+author: "Pablo AcuÃ±a QuirÃ³s"
 date: "5 de junio de 2017"
 output: html_document
 ---
@@ -24,7 +24,7 @@ setwd("C:/Users/paacun/Google Drive/Promidat/Metodos_Avanzados_en Mineria_de_Dat
 ###**Ejercicio 1**
 
 
-####a) Generación de modelos
+####a) GeneraciÃ³n de modelos
 ```{r}
 rm(list=ls(all=TRUE))
 datos<-read.csv("SpamData.csv",sep = ";",dec='.',header=T)
@@ -41,7 +41,7 @@ modelo.kknn
 #Bayes
 modelo.bayes <- naiveBayes(Tipo~.,data=taprendizaje)
 
-#Máquinas de Soporte Vectorial
+#MÃ¡quinas de Soporte Vectorial
 modelo.svm.lineal <- svm(Tipo~., data = taprendizaje, kernel = "linear")
 modelo.svm.lineal
 
@@ -68,7 +68,7 @@ modelo.nnet
 ```
 
 
-####b) Predicción y matriz de confusión
+####b) PredicciÃ³n y matriz de confusiÃ³n
 ```{r, fig.align='center'}
 #K-Vecinos
 prediccion<-predict(modelo.kknn,ttesting[,-58])
@@ -92,7 +92,7 @@ acierto
 error<-1-acierto
 error
 
-#Máquinas de Soporte Vectorial
+#MÃ¡quinas de Soporte Vectorial
 prediccion<-predict(modelo.svm.lineal,ttesting[,-58])
 ## Matriz de Confusion
 MC.svm.lineal<-table(ttesting[,58],prediccion)
@@ -162,7 +162,7 @@ error
 
 Resumen de los resultados:
 
-En términos generales todos los métodos utilizados tienen un buen desempeño en la predicción, teniendo un porcentaje de acierto superior al 90%. En este caso el modelo que no se comporta tan bien es el de Bayes, el cual presenta un porcentaje de éxito. Para el modelo de boosting se puede observar que con 15 iteraciones ya se obtienen resutados bastante favorables.
+En tÃ©rminos generales todos los mÃ©todos utilizados tienen un buen desempeÃ±o en la predicciÃ³n, teniendo un porcentaje de acierto superior al 90%. En este caso el modelo que no se comporta tan bien es el de Bayes, el cual presenta un porcentaje de Ã©xito. Para el modelo de boosting se puede observar que con 15 iteraciones ya se obtienen resutados bastante favorables.
 
 
 ####c) Lista
@@ -186,7 +186,7 @@ rownames(df1) <- c("K-Vecinos","Bayes","SVM lineal","SVM radial","Arboles","Rand
 df1
 ```
 
-De acuerdo a los resultados anteriores se puede observar que el mejor modelo es el de Random Forest ya que tiene una alta precisión global pero a su vez predice muy bien el email como el spam (Precisión positiva).
+De acuerdo a los resultados anteriores se puede observar que el mejor modelo es el de Random Forest ya que tiene una alta precisiÃ³n global pero a su vez predice muy bien el email como el spam (PrecisiÃ³n positiva).
 
 
 
@@ -194,7 +194,7 @@ De acuerdo a los resultados anteriores se puede observar que el mejor modelo es 
 ###**Ejercicio 2**
 
 
-####a) Generación de tabla
+####a) GeneraciÃ³n de tabla
 ```{r}
 datos<-read.csv("DatosIngresos.csv",sep = ";",dec='.',header=T)
 N<-dim(datos)[1]
@@ -205,7 +205,7 @@ taprendizaje <- datos[-muestra,]
 ```
 
 
-####b) Generación de modelos
+####b) GeneraciÃ³n de modelos
 ```{r}
 #K-Vecinos
 modelo.kknn<-train.kknn(Income~.,data=taprendizaje,kmax=9)
@@ -214,7 +214,7 @@ modelo.kknn
 #Bayes
 modelo.bayes <- naiveBayes(Income~.,data=taprendizaje)
 
-#Máquinas de Soporte Vectorial
+#MÃ¡quinas de Soporte Vectorial
 modelo.svm.lineal <- svm(Income~., data = taprendizaje, kernel = "linear")
 modelo.svm.lineal
 
@@ -242,7 +242,7 @@ modelo.nnet
 ```
 
 
-####c) Predicción y matriz de confusión
+####c) PredicciÃ³n y matriz de confusiÃ³n
 ```{r, fig.align='center'}
 #K-Vecinos
 prediccion<-predict(modelo.kknn,ttesting[,-15])
@@ -266,7 +266,7 @@ acierto
 error<-1-acierto
 error
 
-#Máquinas de Soporte Vectorial
+#MÃ¡quinas de Soporte Vectorial
 prediccion<-predict(modelo.svm.lineal,ttesting[,-15])
 ## Matriz de Confusion
 MC.svm.lineal<-table(ttesting[,15],prediccion)
@@ -335,7 +335,7 @@ error
 
 Resumen de los resultados:
 
-En términos generales todos los métodos utilizados tienen un buen un porcentaje de acierto superior al 80%. En este caso el modelo que no se comporta tan bien es el de Redes Neuronales.
+En tÃ©rminos generales todos los mÃ©todos utilizados tienen un buen un porcentaje de acierto superior al 80%. En este caso el modelo que no se comporta tan bien es el de Redes Neuronales.
 
 
 ####d) Data Frame
@@ -346,14 +346,14 @@ rownames(df2) <- c("K-Vecinos","Bayes","SVM lineal","SVM radial","Arboles","Rand
 df2
 ```
 
-El mejor modelo es el de boosting ya que predice de mejor manera (64%) los ingresos >50K y predice en un 93% los ingresos <=50K.Además su precisión global es la más alta de todas.
+El mejor modelo es el de boosting ya que predice de mejor manera (64%) los ingresos >50K y predice en un 93% los ingresos <=50K.AdemÃ¡s su precisiÃ³n global es la mÃ¡s alta de todas.
 
 
 
 ###**Ejercicio 3**
 
 
-####a) Generación de modelos
+####a) GeneraciÃ³n de modelos
 ```{r}
 taprendizaje <- read.csv("ZipDataTrainCod.csv",sep = ";",dec='.',header=T)
 ttesting <- read.csv("ZipDataTestCod.csv",sep = ";",dec='.',header=T)
@@ -366,7 +366,7 @@ modelo.kknn
 #Bayes
 modelo.bayes <- naiveBayes(Numero~.,data=taprendizaje)
 
-#Máquinas de Soporte Vectorial
+#MÃ¡quinas de Soporte Vectorial
 modelo.svm.lineal <- svm(Numero~., data = taprendizaje, kernel = "linear")
 modelo.svm.lineal
 
@@ -382,7 +382,7 @@ modelo.forest<-randomForest(Numero~.,data=taprendizaje,importance=TRUE)
 modelo.forest
 
 #Boosting
-#No es posible realizar este modelo ya que la variable a predecir tiene más de 2 clases.
+#No es posible realizar este modelo ya que la variable a predecir tiene mÃ¡s de 2 clases.
 
 #Redes Neuronales
 modelo.nnet<-nnet(Numero~.,data=taprendizaje,size = 4, rang = 0.1,decay = 5e-4, maxit = 200,trace=FALSE, MaxNWts = 1100)
@@ -390,10 +390,10 @@ modelo.nnet
 ```
 
 
-####b) Predicción y matriz de confusión
+####b) PredicciÃ³n y matriz de confusiÃ³n
 ```{r, fig.align='center'}
 
-#Función para cálculo de cada número
+#FunciÃ³n para cÃ¡lculo de cada nÃºmero
   precision <- function(MC) {
     precision.global <- (sum(diag(MC)))/sum(MC)
     error.global <- 1 - precision.global
@@ -441,7 +441,7 @@ precision.bayes <- as.data.frame(precision(MC.bayes))
 rownames(precision.bayes) <- c("precision global","error global","cero","cinco","cuatro","dos","nueve","ocho","seis","siete","tres","uno")
 precision.bayes
 
-#Máquinas de Soporte Vectorial
+#MÃ¡quinas de Soporte Vectorial
 prediccion<-predict(modelo.svm.lineal,ttesting[,-1])
 ## Matriz de Confusion
 MC.svm.lineal<-table(ttesting[,1],prediccion)
@@ -521,16 +521,16 @@ colnames(df3) <- c("precision global","error global","cero","cinco","cuatro","do
 df3
 ```
 
-Los modelos que mejor describen los datos son el de SVM radial y el de Random Forest. En ambos casos se tiene una precisión global y para cada uno de los números superior al 90%. Los modelos que tienen un peor desempeño para este problema son los de Bayes, Arboles y Redes Neuronales.
+Los modelos que mejor describen los datos son el de SVM radial y el de Random Forest. En ambos casos se tiene una precisiÃ³n global y para cada uno de los nÃºmeros superior al 90%. Los modelos que tienen un peor desempeÃ±o para este problema son los de Bayes, Arboles y Redes Neuronales.
 
 
 
 ###**Ejercicio 4**
 
 
-####a) Selección de tabla de datos
+####a) SelecciÃ³n de tabla de datos
 
-La tabla de datos a utilizar corresponde a la clasificación de muestras de hongos de acuerdo a sus características físicas. Contiene 8124 filas, 22 variables predictoras y la variable edibility que es la variable a predecir, la cual indica si el hongo es comestible (edible) o venenoso (poisonous). La variable a predecir no puede ser una variable cuantitativa continua ya que entonces se estaría ante un problema que requiere una regresión lineal y no un modelo predictivo como los estudiados al día de hoy. Es necesario que la variable a predecir esté delimitada dentro de clases finitas (Cuando las clases son 2 se trata de un problema binario).
+La tabla de datos a utilizar corresponde a la clasificaciÃ³n de muestras de hongos de acuerdo a sus caracterÃ­sticas fÃ­sicas. Contiene 8124 filas, 22 variables predictoras y la variable edibility que es la variable a predecir, la cual indica si el hongo es comestible (edible) o venenoso (poisonous). La variable a predecir no puede ser una variable cuantitativa continua ya que entonces se estarÃ­a ante un problema que requiere una regresiÃ³n lineal y no un modelo predictivo como los estudiados al dÃ­a de hoy. Es necesario que la variable a predecir estÃ© delimitada dentro de clases finitas (Cuando las clases son 2 se trata de un problema binario).
 
 
 ####b) Diccionario de Datos
@@ -558,10 +558,10 @@ Las variables predictoras son:
 22- population: abundant=a,clustered=c,numerous=n, scattered=s,several=v,solitary=y 
 23- habitat: grasses=g,leaves=l,meadows=m,paths=p, urban=u,waste=w,woods=d
 
-Todas las variables son cualitativas. Además, para el ejemplo se ignora la varible stalk-root ya que tiene muchos valores missing y la variable veil-type ya que tiene una sola categoría y no aporta valor al modelo.
+Todas las variables son cualitativas. AdemÃ¡s, para el ejemplo se ignora la varible stalk-root ya que tiene muchos valores missing y la variable veil-type ya que tiene una sola categorÃ­a y no aporta valor al modelo.
 
 
-####c) Generación de tabla de testing
+####c) GeneraciÃ³n de tabla de testing
 ```{r}
 datos<-read.csv("agaricus-lepiota.csv",sep = ",",dec='.',header=T)
 datos <- datos[- c(12,17)]
@@ -573,7 +573,7 @@ taprendizaje <- datos[-muestra,]
 ```
 
 
-####d) Generación de modelos
+####d) GeneraciÃ³n de modelos
 ```{r}
 #K-Vecinos
 modelo.kknn<-train.kknn(edibility~.,data=taprendizaje,kmax=9)
@@ -582,7 +582,7 @@ modelo.kknn
 #Bayes
 modelo.bayes <- naiveBayes(edibility~.,data=taprendizaje)
 
-#Máquinas de Soporte Vectorial
+#MÃ¡quinas de Soporte Vectorial
 modelo.svm.lineal <- svm(edibility~., data = taprendizaje, kernel = "linear")
 modelo.svm.lineal
 
@@ -610,7 +610,7 @@ modelo.nnet
 ```
 
 
-####e) Predicción y matriz de confusión
+####e) PredicciÃ³n y matriz de confusiÃ³n
 ```{r, fig.align='center'}
 #K-Vecinos
 prediccion<-predict(modelo.kknn,ttesting[,-1])
@@ -634,7 +634,7 @@ acierto
 error<-1-acierto
 error
 
-#Máquinas de Soporte Vectorial
+#MÃ¡quinas de Soporte Vectorial
 prediccion<-predict(modelo.svm.lineal,ttesting[,-1])
 ## Matriz de Confusion
 MC.svm.lineal<-table(ttesting[,1],prediccion)
@@ -710,4 +710,4 @@ df4
 ```
 
 Resumen de resultados:
-Este problema en específico se presenta como uno de fácil predicción en donde todos los modelos predicen de manera excelente los datos presentados. Es interesante conocer si debido a que todas las variable predictoras son categóricas, se facilita el modelado y por ende la predicción.
+Este problema en especÃ­fico se presenta como uno de fÃ¡cil predicciÃ³n en donde todos los modelos predicen de manera excelente los datos presentados. Es interesante conocer si debido a que todas las variable predictoras son categÃ³ricas, se facilita el modelado y por ende la predicciÃ³n.
