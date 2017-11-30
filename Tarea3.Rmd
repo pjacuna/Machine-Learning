@@ -1,0 +1,258 @@
+---
+title: "Tarea3_pablo_acuna"
+author: "Pablo Acuña Quirós"
+output: html_document
+---
+
+###**Ejercicio 1**
+
+
+#### Datos Ingresos
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(rmarkdown)
+library(readxl)
+suppressWarnings(suppressMessages(library(kknn)))
+library(e1071)
+library(class)
+library(rpart)
+library(rpart.plot)
+library(randomForest)
+library(ada)
+library(nnet)
+library(ROCR)
+library(caret)
+setwd("C:/Users/paacun/Google Drive/Promidat/Metodos_Avanzados_en Mineria_de_Datos_Legrende/Tarea3")
+
+plotROC <- function(prediccion,real,adicionar=FALSE,color="red") {
+  pred <- prediction(prediccion,real)    
+  perf <- performance(pred,"tpr","fpr")
+  plot(perf,col=color,add=adicionar,main="Curva ROC")
+  segments(0,0,1,1,col='black')
+  grid()  
+}
+
+areaROC <- function(prediccion,real) {
+  pred <- prediction(prediccion,real)
+  auc<-performance(pred,"auc")
+  return(attributes(auc)$y.values[[1]])
+}
+```
+
+#### Tablas
+```{r}
+#Tablas
+datos<-read.csv("DatosIngresos.csv",sep = ";",dec='.',header=T)
+N<-dim(datos)[1]
+str(datos)
+muestra <- sample(1:N,N*0.3)
+ttesting <- datos[muestra,]
+taprendizaje <- datos[-muestra,]
+```
+
+#### Generación de modelos
+```{r}
+#Bayes
+modelo.bayes <- naiveBayes(Income~.,data=taprendizaje)
+
+#Máquinas de Soporte Vectorial
+modelo.svm.lineal <- svm(Income~., data = taprendizaje, kernel = "linear",probability = TRUE)
+
+modelo.svm.radial <- svm(Income~., data = taprendizaje,probability = TRUE)
+
+#Tree
+modelo.rpart <- rpart(Income~.,data = taprendizaje)
+
+#Forest
+modelo.forest<-randomForest(Income~.,data=taprendizaje,importance=TRUE)
+
+#Boosting
+modelo.ada<-ada(Income~.,data=taprendizaje,iter=20,nu=1,type="discrete")
+
+#Redes Neuronales
+modelo.nnet<-nnet(Income~.,data=taprendizaje,size = 4, rang = 0.1,decay = 5e-4, maxit = 100,trace=FALSE)
+```
+
+#### Predicción y curvas ROC
+```{r, fig.align='center'}
+#Bayes
+prediccion.bayes<-predict(modelo.bayes,ttesting,type="raw")
+head(prediccion.bayes)
+Score.bayes <- prediccion.bayes[,2]
+Clase.bayes<-ttesting$Income
+plotROC(Score.bayes,Clase.bayes)
+
+#Máquinas de Soporte Vectorial
+prediccion.svm.lineal<-predict(modelo.svm.lineal,ttesting,probability = TRUE)
+head(attributes(prediccion.svm.lineal)$probabilities)
+Score.svm.lineal <- attributes(prediccion.svm.lineal)$probabilities[,2]
+Clase.svm.lineal<-ttesting$Income
+plotROC(Score.svm.lineal,Clase.svm.lineal,adicionar=TRUE,color="blue")
+
+prediccion.svm.radial<-predict(modelo.svm.radial,ttesting,probability = TRUE)
+head(attributes(prediccion.svm.radial)$probabilities)
+Score.svm.radial <- attributes(prediccion.svm.radial)$probabilities[,2]
+Clase.svm.radial<-ttesting$Income
+plotROC(Score.svm.radial,Clase.svm.radial,adicionar=TRUE,color="magenta")
+
+#Tree
+prediccion.rpart <- predict(modelo.rpart, ttesting,type="prob")
+head(prediccion.rpart)
+Score.rpart <- prediccion.rpart[,2]
+Clase.rpart<-ttesting$Income
+plotROC(Score.rpart,Clase.rpart,adicionar=TRUE,color="green")
+
+#Forest
+prediccion.forest<-predict(modelo.forest,ttesting,type="prob")
+head(prediccion.forest)
+Score.forest <- prediccion.forest[,2]
+Clase.forest<-ttesting$Income
+plotROC(Score.forest,Clase.forest,adicionar=TRUE,color="yellow")
+
+#Boosting
+prediccion.ada<-predict(modelo.ada,ttesting,type="prob")
+head(prediccion.ada)
+Score.ada <- prediccion.ada[,2]
+Clase.ada<-ttesting$Income
+plotROC(Score.ada,Clase.ada,adicionar=TRUE,color="cyan")
+
+#Redes Neuronales
+prediccion.nnet<-predict(modelo.nnet,ttesting,type="raw")
+head(prediccion.nnet)
+Score.nnet <- prediccion.nnet[,1]
+Clase.nnet<-ttesting$Income
+plotROC(Score.nnet,Clase.nnet,adicionar=TRUE,color="orange")
+legend("bottomright", legend = c("Bayes","SVM Lineal","SVM Radial","Tree","Forest","Boosting","Redes Neuronales"), col = c("red","blue","magenta","green","yellow","cyan","orange"), lty = 1, lwd = 1)
+```
+
+Observando las curvas parece ser que el mejor modelo es el de Forest (Curva amarilla).
+
+#### Area bajo la curva
+```{r}
+#Bayes
+areaROC(Score.bayes,Clase.bayes)
+#Máquinas de Soporte Vectorial
+#Lineal
+areaROC(Score.svm.lineal,Clase.svm.lineal)
+#Radial
+areaROC(Score.svm.radial,Clase.svm.radial)
+#Tree
+areaROC(Score.rpart,Clase.rpart)
+#Forest
+areaROC(Score.forest,Clase.forest)
+#Boosting
+areaROC(Score.ada,Clase.ada)
+#Redes Neuronales
+areaROC(Score.nnet,Clase.nnet)
+```
+
+Se confirma que el modelo de Forest es el que tiene el mayor área bajo la curva por lo que según éste criterio es el mejor.
+
+
+###**Ejercicio 2**
+
+####a) Enfoque training-testing
+```{r}
+v.error.tt<-rep(0,5)
+for(i in 1:5) {
+  muestra <- sample(1:N,N*0.3)
+  ttesting <- datos[muestra,]
+  taprendizaje <- datos[-muestra,]
+  modelo.kknn<-train.kknn(Income~.,data=taprendizaje,kmax=25)
+  prediccion<-predict(modelo.kknn,ttesting[,-15])
+  MC.kknn<-table(ttesting[,15],prediccion)
+  acierto<-(sum(diag(MC.kknn)))/sum(MC.kknn)
+  error<-1-acierto
+
+  v.error.tt[i] <- error
+}  
+
+```
+
+####a) Enfoque K-fold cross-validation
+```{r}
+n <- dim(datos)[1]
+v.error.kg<-rep(0,5)
+for(i in 1:5) {
+  errori <- 0
+  grupos <- createFolds(1:n,10)  
+  for(k in 1:10) {    
+      muestra <- grupos[[k]]
+      ttesting <- datos[muestra,]
+      taprendizaje <- datos[-muestra,]
+      modelo.kknn<-train.kknn(Income~.,data=taprendizaje,kmax=25)
+      prediccion<-predict(modelo.kknn,ttesting[,-15])
+      MC.kknn<-table(ttesting[,15],prediccion)
+      acierto<-(sum(diag(MC.kknn)))/sum(MC.kknn)
+      error<-1-acierto
+      errori <- errori + error
+  } 
+  v.error.kg[i] <- errori/10
+}
+
+```
+
+Gráfica de variación de error:
+```{r}
+plot(v.error.tt, col = "blue", type = "b", ylim = c(min(v.error.kg,v.error.tt) - 0.01, max(v.error.kg,v.error.tt) + 0.01), main = "Variación del Error - Método Training", xlab = "Número de iteración", ylab = "Estimación del Error")
+points(v.error.kg, col = "red", type = "b")
+legend("topright", legend = c("Tabla Testing","K-ésimo grupo"), col = c("blue","red"), lty = 1, lwd = 1)
+```
+
+
+
+####c) Enfoque training-testing -- Redes Neuronales
+```{r}
+v.error.tt.2<-rep(0,5)
+for(i in 1:5) {
+  muestra <- sample(1:N,N*0.3)
+  ttesting <- datos[muestra,]
+  taprendizaje <- datos[-muestra,]
+  modelo.nnet<-nnet(Income~.,data=taprendizaje,size = 4, rang = 0.1,decay = 5e-4, maxit = 100,trace=FALSE)
+  prediccion<-predict(modelo.nnet,ttesting[,-15],type="class")
+  MC.nnet<-table(ttesting$Income,prediccion)
+  acierto<-(sum(diag(MC.nnet)))/sum(MC.nnet)
+  error<-1-acierto
+
+  v.error.tt.2[i] <- error
+}  
+
+```
+
+
+#### Enfoque K-fold cross-validation -- Redes Neuronales
+```{r}
+n <- dim(datos)[1]
+v.error.kg.2<-rep(0,5)
+for(i in 1:5) {
+  errori <- 0
+  grupos <- createFolds(1:n,10)  
+  for(k in 1:10) {    
+      muestra <- grupos[[k]]
+      ttesting <- datos[muestra,]
+      taprendizaje <- datos[-muestra,]
+      modelo.nnet<-nnet(Income~.,data=taprendizaje,size = 4, rang = 0.1,decay = 5e-4, maxit = 200,trace=FALSE)
+      prediccion<-predict(modelo.nnet,ttesting[,-15],type="class")
+      MC.nnet<-table(ttesting$Income,prediccion)
+      acierto<-(sum(diag(MC.nnet)))/sum(MC.nnet)
+      error<-1-acierto
+      errori <- errori + error
+  } 
+  v.error.kg.2[i] <- errori/10
+}
+```
+
+Gráfica de variación de error:
+```{r}
+plot(v.error.tt.2, col = "blue", type = "b", ylim = c(min(v.error.kg.2,v.error.tt.2) - 0.01, max(v.error.kg.2,v.error.tt.2) + 0.01), main = "Variación del Error - Método K-fold", xlab = "Número de iteración", ylab = "Estimación del Error")
+points(v.error.kg.2, col = "red", type = "b")
+legend("topright", legend = c("Tabla Testing","K-ésimo grupo"), col = c("blue","red"), lty = 1, lwd = 1)
+```
+
+####c) Conclusión
+Se puede observar que para ambos métodos de predicción, el sistema que presenta una menor variabilidad en el cálculo del error es el de K-ésimo grupo o K-fold. Ahora bien, para este problema en específico el modelado a través del método de k medias produce un error más bajo que el modelado con el método de redes neuronales. La principal conclusión que se puede sacar es que hay mejores maneras de seleccionar la tabla de testing vs el método que se venía utilizando de training-testing. El método de K-fold permite reducir el error lo que hace al modelo más eficiente.
+
+
+###**Ejercicio 3**
+![](C:/Users/paacun/Google Drive/Promidat/Metodos_Avanzados_en Mineria_de_Datos_Legrende/Tarea3/Captura.jpg)

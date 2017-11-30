@@ -1,0 +1,713 @@
+---
+title: "Tarea2 - Métodos avanzados en minería de datos"
+author: "Pablo Acuña Quirós"
+date: "5 de junio de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(rmarkdown)
+library(readxl)
+suppressWarnings(suppressMessages(library(kknn)))
+library(e1071)
+library(class)
+library(rpart)
+library(rpart.plot)
+library(randomForest)
+library(ada)
+library(nnet)
+setwd("C:/Users/paacun/Google Drive/Promidat/Metodos_Avanzados_en Mineria_de_Datos_Legrende/Tarea2")
+```
+
+###**Ejercicio 1**
+
+
+####a) Generación de modelos
+```{r}
+rm(list=ls(all=TRUE))
+datos<-read.csv("SpamData.csv",sep = ";",dec='.',header=T)
+N<-dim(datos)[1]
+#str(datos)
+muestra <- sample(1:N,N*0.3)
+ttesting <- datos[muestra,]
+taprendizaje <- datos[-muestra,]
+
+#K-Vecinos
+modelo.kknn<-train.kknn(Tipo~.,data=taprendizaje,kmax=9)
+modelo.kknn
+
+#Bayes
+modelo.bayes <- naiveBayes(Tipo~.,data=taprendizaje)
+
+#Máquinas de Soporte Vectorial
+modelo.svm.lineal <- svm(Tipo~., data = taprendizaje, kernel = "linear")
+modelo.svm.lineal
+
+modelo.svm.radial <- svm(Tipo~., data = taprendizaje)
+modelo.svm.radial
+
+#Tree
+modelo.rpart <- rpart(Tipo~.,data = taprendizaje)
+modelo.rpart
+
+#Forest
+modelo.forest<-randomForest(Tipo~.,data=taprendizaje,importance=TRUE)
+modelo.forest
+
+#Boosting
+modelo.ada<-ada(Tipo~.,data=taprendizaje,iter=20,nu=1,type="discrete")
+modelo.ada
+plot(modelo.ada,TRUE,TRUE)
+varplot(modelo.ada)
+
+#Redes Neuronales
+modelo.nnet<-nnet(Tipo~.,data=taprendizaje,size = 4, rang = 0.1,decay = 5e-4, maxit = 200,trace=FALSE)
+modelo.nnet
+```
+
+
+####b) Predicción y matriz de confusión
+```{r, fig.align='center'}
+#K-Vecinos
+prediccion<-predict(modelo.kknn,ttesting[,-58])
+## Matriz de Confusion
+MC.kknn<-table(ttesting[,58],prediccion)
+MC.kknn
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.kknn)))/sum(MC.kknn)
+acierto
+error<-1-acierto
+error
+
+#Bayes
+prediccion<-predict(modelo.bayes,ttesting[,-58])
+## Matriz de Confusion
+MC.bayes<-table(ttesting[,58],prediccion)
+MC.bayes
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.bayes)))/sum(MC.bayes)
+acierto
+error<-1-acierto
+error
+
+#Máquinas de Soporte Vectorial
+prediccion<-predict(modelo.svm.lineal,ttesting[,-58])
+## Matriz de Confusion
+MC.svm.lineal<-table(ttesting[,58],prediccion)
+MC.svm.lineal
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.svm.lineal)))/sum(MC.svm.lineal)
+acierto
+error<-1-acierto
+error
+
+prediccion<-predict(modelo.svm.radial,ttesting[,-58])
+## Matriz de Confusion
+MC.svm.radial<-table(ttesting[,58],prediccion)
+MC.svm.radial
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.svm.radial)))/sum(MC.svm.radial)
+acierto
+error<-1-acierto
+error
+
+#Tree
+prediccion <- predict(modelo.rpart, ttesting, type='class')
+prp(modelo.rpart,extra=104,branch.type=2, box.col=c("pink", "palegreen3")[modelo.rpart$frame$yval])
+#S puede ver que si se cumplen los siguientes criterios: A.53<0.056, A.7<0.05 y A.52<0.46 el modelo predice en un 90% que se trata de un email.
+## Matriz de Confusion
+MC.rpart<-table(ttesting$Tipo,prediccion)
+MC.rpart
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.rpart)))/sum(MC.rpart)
+acierto
+error<-1-acierto
+error
+
+#Forest
+prediccion<-predict(modelo.forest,ttesting[,-58])
+## Matriz de Confusion
+MC.forest<-table(ttesting$Tipo,prediccion)
+MC.forest
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.forest)))/sum(MC.forest)
+acierto
+error<-1-acierto
+error
+
+#Boosting
+prediccion<-predict(modelo.ada,ttesting[,-58])
+## Matriz de Confusion
+MC.boosting<-table(ttesting$Tipo,prediccion)
+MC.boosting
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.boosting)))/sum(MC.boosting)
+acierto
+error<-1-acierto
+error
+
+#Redes Neuronales
+prediccion<-predict(modelo.nnet,ttesting[,-58],type="class")
+## Matriz de Confusion
+MC.nnet<-table(ttesting$Tipo,prediccion)
+MC.nnet
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.nnet)))/sum(MC.nnet)
+acierto
+error<-1-acierto
+error
+```
+
+Resumen de los resultados:
+
+En términos generales todos los métodos utilizados tienen un buen desempeño en la predicción, teniendo un porcentaje de acierto superior al 90%. En este caso el modelo que no se comporta tan bien es el de Bayes, el cual presenta un porcentaje de éxito. Para el modelo de boosting se puede observar que con 15 iteraciones ya se obtienen resutados bastante favorables.
+
+
+####c) Lista
+```{r}
+lista <- function(matriz) {
+precision <- (sum(diag(matriz)))/sum(matriz)
+p.p <- matriz[2,2]/sum(matriz[2,])
+p.n <- matriz[1,1]/sum(matriz[1,])
+f.p <- matriz[1,2]/sum(matriz[1,])
+f.n <- matriz[2,1]/sum(matriz[2,])
+valores <- list(Precision = precision, Precision_Positiva = p.p, Precision_Negativa = p.n, Falsos_Positivos = f.p, Falsos_Negativos = f.n)
+return(valores)
+}
+```
+
+
+####d) Data Frame
+```{r}
+df1 <- rbind(lista(MC.kknn), lista(MC.bayes), lista(MC.svm.lineal), lista(MC.svm.radial), lista(MC.rpart), lista(MC.forest), lista(MC.boosting), lista(MC.nnet))
+rownames(df1) <- c("K-Vecinos","Bayes","SVM lineal","SVM radial","Arboles","Random Forest","Boosting","Redes Neuronales")
+df1
+```
+
+De acuerdo a los resultados anteriores se puede observar que el mejor modelo es el de Random Forest ya que tiene una alta precisión global pero a su vez predice muy bien el email como el spam (Precisión positiva).
+
+
+
+
+###**Ejercicio 2**
+
+
+####a) Generación de tabla
+```{r}
+datos<-read.csv("DatosIngresos.csv",sep = ";",dec='.',header=T)
+N<-dim(datos)[1]
+str(datos)
+muestra <- sample(1:N,N*0.3)
+ttesting <- datos[muestra,]
+taprendizaje <- datos[-muestra,]
+```
+
+
+####b) Generación de modelos
+```{r}
+#K-Vecinos
+modelo.kknn<-train.kknn(Income~.,data=taprendizaje,kmax=9)
+modelo.kknn
+
+#Bayes
+modelo.bayes <- naiveBayes(Income~.,data=taprendizaje)
+
+#Máquinas de Soporte Vectorial
+modelo.svm.lineal <- svm(Income~., data = taprendizaje, kernel = "linear")
+modelo.svm.lineal
+
+modelo.svm.radial <- svm(Income~., data = taprendizaje)
+modelo.svm.radial
+
+#Tree
+modelo.rpart <- rpart(Income~.,data = taprendizaje)
+modelo.rpart
+#
+
+#Forest
+modelo.forest<-randomForest(Income~.,data=taprendizaje,importance=TRUE)
+modelo.forest
+
+#Boosting
+modelo.ada<-ada(Income~.,data=taprendizaje,iter=20,nu=1,type="discrete")
+modelo.ada
+plot(modelo.ada,TRUE,TRUE)
+varplot(modelo.ada)
+
+#Redes Neuronales
+modelo.nnet<-nnet(Income~.,data=taprendizaje,size = 4, rang = 0.1,decay = 5e-4, maxit = 200,trace=FALSE)
+modelo.nnet
+```
+
+
+####c) Predicción y matriz de confusión
+```{r, fig.align='center'}
+#K-Vecinos
+prediccion<-predict(modelo.kknn,ttesting[,-15])
+## Matriz de Confusion
+MC.kknn<-table(ttesting[,15],prediccion)
+MC.kknn
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.kknn)))/sum(MC.kknn)
+acierto
+error<-1-acierto
+error
+
+#Bayes
+prediccion<-predict(modelo.bayes,ttesting[,-15])
+## Matriz de Confusion
+MC.bayes<-table(ttesting[,15],prediccion)
+MC.bayes
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.bayes)))/sum(MC.bayes)
+acierto
+error<-1-acierto
+error
+
+#Máquinas de Soporte Vectorial
+prediccion<-predict(modelo.svm.lineal,ttesting[,-15])
+## Matriz de Confusion
+MC.svm.lineal<-table(ttesting[,15],prediccion)
+MC.svm.lineal
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.svm.lineal)))/sum(MC.svm.lineal)
+acierto
+error<-1-acierto
+error
+
+prediccion<-predict(modelo.svm.radial,ttesting[,-15])
+## Matriz de Confusion
+MC.svm.radial<-table(ttesting[,15],prediccion)
+MC.svm.radial
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.svm.radial)))/sum(MC.svm.radial)
+acierto
+error<-1-acierto
+error
+
+#Tree
+prediccion <- predict(modelo.rpart, ttesting, type='class')
+prp(modelo.rpart,extra=104,branch.type=2, box.col=heat.colors(5)[modelo.rpart$frame$yval])
+## Matriz de Confusion
+MC.rpart<-table(ttesting$Income,prediccion)
+MC.rpart
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.rpart)))/sum(MC.rpart)
+acierto
+error<-1-acierto
+error
+
+#Forest
+prediccion<-predict(modelo.forest,ttesting[,-15])
+## Matriz de Confusion
+MC.forest<-table(ttesting$Income,prediccion)
+MC.forest
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.forest)))/sum(MC.forest)
+acierto
+error<-1-acierto
+error
+
+#Boosting
+prediccion<-predict(modelo.ada,ttesting[,-15])
+## Matriz de Confusion
+MC.boosting<-table(ttesting$Income,prediccion)
+MC.boosting
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.boosting)))/sum(MC.boosting)
+acierto
+error<-1-acierto
+error
+
+#Redes Neuronales
+prediccion<-predict(modelo.nnet,ttesting[,-15],type="class")
+## Matriz de Confusion
+MC.nnet<-table(ttesting$Income,prediccion)
+MC.nnet
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.nnet)))/sum(MC.nnet)
+acierto
+error<-1-acierto
+error
+```
+
+Resumen de los resultados:
+
+En términos generales todos los métodos utilizados tienen un buen un porcentaje de acierto superior al 80%. En este caso el modelo que no se comporta tan bien es el de Redes Neuronales.
+
+
+####d) Data Frame
+```{r}
+MC.nnet <- cbind(MC.nnet, c(0,0))
+df2 <- rbind(lista(MC.kknn), lista(MC.bayes), lista(MC.svm.lineal), lista(MC.svm.radial), lista(MC.rpart), lista(MC.forest), lista(MC.boosting), lista(MC.nnet))
+rownames(df2) <- c("K-Vecinos","Bayes","SVM lineal","SVM radial","Arboles","Random Forest","Boosting","Redes Neuronales")
+df2
+```
+
+El mejor modelo es el de boosting ya que predice de mejor manera (64%) los ingresos >50K y predice en un 93% los ingresos <=50K.Además su precisión global es la más alta de todas.
+
+
+
+###**Ejercicio 3**
+
+
+####a) Generación de modelos
+```{r}
+taprendizaje <- read.csv("ZipDataTrainCod.csv",sep = ";",dec='.',header=T)
+ttesting <- read.csv("ZipDataTestCod.csv",sep = ";",dec='.',header=T)
+#str(datos)
+
+#K-Vecinos
+modelo.kknn<-train.kknn(Numero~.,data=taprendizaje,kmax=9)
+modelo.kknn
+
+#Bayes
+modelo.bayes <- naiveBayes(Numero~.,data=taprendizaje)
+
+#Máquinas de Soporte Vectorial
+modelo.svm.lineal <- svm(Numero~., data = taprendizaje, kernel = "linear")
+modelo.svm.lineal
+
+modelo.svm.radial <- svm(Numero~., data = taprendizaje)
+modelo.svm.radial
+
+#Tree
+modelo.rpart <- rpart(Numero~.,data = taprendizaje)
+modelo.rpart
+
+#Forest
+modelo.forest<-randomForest(Numero~.,data=taprendizaje,importance=TRUE)
+modelo.forest
+
+#Boosting
+#No es posible realizar este modelo ya que la variable a predecir tiene más de 2 clases.
+
+#Redes Neuronales
+modelo.nnet<-nnet(Numero~.,data=taprendizaje,size = 4, rang = 0.1,decay = 5e-4, maxit = 200,trace=FALSE, MaxNWts = 1100)
+modelo.nnet
+```
+
+
+####b) Predicción y matriz de confusión
+```{r, fig.align='center'}
+
+#Función para cálculo de cada número
+  precision <- function(MC) {
+    precision.global <- (sum(diag(MC)))/sum(MC)
+    error.global <- 1 - precision.global
+    cero <- MC[1,1]/sum(MC[1,1:10])
+    cinco <- MC[2,2]/sum(MC[2,1:10])
+    cuatro <- MC[3,3]/sum(MC[3,1:10])
+    dos <- MC[4,4]/sum(MC[4,1:10])
+    nueve <- MC[5,5]/sum(MC[5,1:10])
+    ocho <- MC[6,6]/sum(MC[6,1:10])
+    seis <- MC[7,7]/sum(MC[7,1:10])
+    siete <- MC[8,8]/sum(MC[8,1:10])
+    tres <- MC[9,9]/sum(MC[9,1:10])
+    uno <- MC[10,10]/sum(MC[10,1:10])
+    valores <- c(precision.global,error.global,cero,cinco,cuatro,dos,nueve,ocho,seis,siete,tres,uno)
+    #colnames(valores) <- c("precision global","error global","cero","cinco","cuatro","dos","nueve","ocho","seis","siete","tres","uno")
+  return(valores)
+  }
+
+
+#K-Vecinos
+prediccion<-predict(modelo.kknn,ttesting[,-1])
+## Matriz de Confusion
+MC.kknn<-table(ttesting[,1],prediccion)
+MC.kknn
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.kknn)))/sum(MC.kknn)
+acierto
+error<-1-acierto
+error
+precision.kknn <- as.data.frame(precision(MC.kknn))
+rownames(precision.kknn) <- c("precision global","error global","cero","cinco","cuatro","dos","nueve","ocho","seis","siete","tres","uno")
+precision.kknn
+
+#Bayes
+prediccion<-predict(modelo.bayes,ttesting[,-1])
+## Matriz de Confusion
+MC.bayes<-table(ttesting[,1],prediccion)
+MC.bayes
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.bayes)))/sum(MC.bayes)
+acierto
+error<-1-acierto
+error
+precision.bayes <- as.data.frame(precision(MC.bayes))
+rownames(precision.bayes) <- c("precision global","error global","cero","cinco","cuatro","dos","nueve","ocho","seis","siete","tres","uno")
+precision.bayes
+
+#Máquinas de Soporte Vectorial
+prediccion<-predict(modelo.svm.lineal,ttesting[,-1])
+## Matriz de Confusion
+MC.svm.lineal<-table(ttesting[,1],prediccion)
+MC.svm.lineal
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.svm.lineal)))/sum(MC.svm.lineal)
+acierto
+error<-1-acierto
+error
+precision.svm.lineal <- as.data.frame(precision(MC.svm.lineal))
+rownames(precision.svm.lineal) <- c("precision global","error global","cero","cinco","cuatro","dos","nueve","ocho","seis","siete","tres","uno")
+precision.svm.lineal
+
+prediccion<-predict(modelo.svm.radial,ttesting[,-1])
+## Matriz de Confusion
+MC.svm.radial<-table(ttesting[,1],prediccion)
+MC.svm.radial
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.svm.radial)))/sum(MC.svm.radial)
+acierto
+error<-1-acierto
+error
+precision.svm.radial <- as.data.frame(precision(MC.svm.radial))
+rownames(precision.svm.radial) <- c("precision global","error global","cero","cinco","cuatro","dos","nueve","ocho","seis","siete","tres","uno")
+precision.svm.radial
+
+#Tree
+prediccion <- predict(modelo.rpart, ttesting, type='class')
+prp(modelo.rpart,extra=104,branch.type=2, box.col=heat.colors(14)[modelo.rpart$frame$yval])
+## Matriz de Confusion
+MC.rpart<-table(ttesting$Numero,prediccion)
+MC.rpart
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.rpart)))/sum(MC.rpart)
+acierto
+error<-1-acierto
+error
+precision.rpart <- as.data.frame(precision(MC.rpart))
+rownames(precision.rpart) <- c("precision global","error global","cero","cinco","cuatro","dos","nueve","ocho","seis","siete","tres","uno")
+precision.rpart
+
+#Forest
+prediccion<-predict(modelo.forest,ttesting[,-1])
+## Matriz de Confusion
+MC.forest<-table(ttesting$Numero,prediccion)
+MC.forest
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.forest)))/sum(MC.forest)
+acierto
+error<-1-acierto
+error
+precision.forest <- as.data.frame(precision(MC.forest))
+rownames(precision.forest) <- c("precision global","error global","cero","cinco","cuatro","dos","nueve","ocho","seis","siete","tres","uno")
+precision.forest
+
+#Redes Neuronales
+prediccion<-predict(modelo.nnet,ttesting[,-1],type="class")
+## Matriz de Confusion
+MC.nnet<-table(ttesting$Numero,prediccion)
+MC.nnet
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.nnet)))/sum(MC.nnet)
+acierto
+error<-1-acierto
+error
+precision.nnet <- as.data.frame(precision(MC.nnet))
+rownames(precision.nnet) <- c("precision global","error global","cero","cinco","cuatro","dos","nueve","ocho","seis","siete","tres","uno")
+precision.nnet
+```
+
+
+####c) Resultados
+```{r}
+df3 <- rbind(precision(MC.kknn), precision(MC.bayes), precision(MC.svm.lineal), precision(MC.svm.radial), precision(MC.rpart), precision(MC.forest), precision(MC.nnet))
+rownames(df3) <- c("K-Vecinos","Bayes","SVM lineal","SVM radial","Arboles","Random Forest","Redes Neuronales")
+colnames(df3) <- c("precision global","error global","cero","cinco","cuatro","dos","nueve","ocho","seis","siete","tres","uno")
+df3
+```
+
+Los modelos que mejor describen los datos son el de SVM radial y el de Random Forest. En ambos casos se tiene una precisión global y para cada uno de los números superior al 90%. Los modelos que tienen un peor desempeño para este problema son los de Bayes, Arboles y Redes Neuronales.
+
+
+
+###**Ejercicio 4**
+
+
+####a) Selección de tabla de datos
+
+La tabla de datos a utilizar corresponde a la clasificación de muestras de hongos de acuerdo a sus características físicas. Contiene 8124 filas, 22 variables predictoras y la variable edibility que es la variable a predecir, la cual indica si el hongo es comestible (edible) o venenoso (poisonous). La variable a predecir no puede ser una variable cuantitativa continua ya que entonces se estaría ante un problema que requiere una regresión lineal y no un modelo predictivo como los estudiados al día de hoy. Es necesario que la variable a predecir esté delimitada dentro de clases finitas (Cuando las clases son 2 se trata de un problema binario).
+
+
+####b) Diccionario de Datos
+Las variables predictoras son:
+2- cap-shape: bell=b,conical=c,convex=x,flat=f, knobbed=k,sunken=s 
+3- cap-surface: fibrous=f,grooves=g,scaly=y,smooth=s 
+4- cap-color: brown=n,buff=b,cinnamon=c,gray=g,green=r, pink=p,purple=u,red=e,white=w,yellow=y 
+5- bruises?: bruises=t,no=f 
+6- odor: almond=a,anise=l,creosote=c,fishy=y,foul=f, musty=m,none=n,pungent=p,spicy=s 
+7- gill-attachment: attached=a,descending=d,free=f,notched=n 
+8- gill-spacing: close=c,crowded=w,distant=d 
+9- gill-size: broad=b,narrow=n 
+10- gill-color: black=k,brown=n,buff=b,chocolate=h,gray=g, green=r,orange=o,pink=p,purple=u,red=e, white=w,yellow=y 
+11- stalk-shape: enlarging=e,tapering=t 
+12- stalk-root: bulbous=b,club=c,cup=u,equal=e, rhizomorphs=z,rooted=r,missing=? 
+13- stalk-surface-above-ring: fibrous=f,scaly=y,silky=k,smooth=s 
+14- stalk-surface-below-ring: fibrous=f,scaly=y,silky=k,smooth=s 
+15- stalk-color-above-ring: brown=n,buff=b,cinnamon=c,gray=g,orange=o, pink=p,red=e,white=w,yellow=y 
+16- stalk-color-below-ring: brown=n,buff=b,cinnamon=c,gray=g,orange=o, pink=p,red=e,white=w,yellow=y 
+17- veil-type: partial=p,universal=u 
+18- veil-color: brown=n,orange=o,white=w,yellow=y 
+19- ring-number: none=n,one=o,two=t 
+20- ring-type: cobwebby=c,evanescent=e,flaring=f,large=l, none=n,pendant=p,sheathing=s,zone=z 
+21- spore-print-color: black=k,brown=n,buff=b,chocolate=h,green=r, orange=o,purple=u,white=w,yellow=y 
+22- population: abundant=a,clustered=c,numerous=n, scattered=s,several=v,solitary=y 
+23- habitat: grasses=g,leaves=l,meadows=m,paths=p, urban=u,waste=w,woods=d
+
+Todas las variables son cualitativas. Además, para el ejemplo se ignora la varible stalk-root ya que tiene muchos valores missing y la variable veil-type ya que tiene una sola categoría y no aporta valor al modelo.
+
+
+####c) Generación de tabla de testing
+```{r}
+datos<-read.csv("agaricus-lepiota.csv",sep = ",",dec='.',header=T)
+datos <- datos[- c(12,17)]
+N<-dim(datos)[1]
+str(datos)
+muestra <- sample(1:N,N*0.25)
+ttesting <- datos[muestra,]
+taprendizaje <- datos[-muestra,]
+```
+
+
+####d) Generación de modelos
+```{r}
+#K-Vecinos
+modelo.kknn<-train.kknn(edibility~.,data=taprendizaje,kmax=9)
+modelo.kknn
+
+#Bayes
+modelo.bayes <- naiveBayes(edibility~.,data=taprendizaje)
+
+#Máquinas de Soporte Vectorial
+modelo.svm.lineal <- svm(edibility~., data = taprendizaje, kernel = "linear")
+modelo.svm.lineal
+
+modelo.svm.radial <- svm(edibility~., data = taprendizaje)
+modelo.svm.radial
+
+#Tree
+modelo.rpart <- rpart(edibility~.,data = taprendizaje)
+modelo.rpart
+
+#Forest
+modelo.forest<-randomForest(edibility~.,data=taprendizaje,importance=TRUE)
+modelo.forest
+
+#Boosting
+modelo.ada<-ada(edibility~.,data=taprendizaje,iter=20,nu=1,type="discrete")
+modelo.ada
+plot(modelo.ada,TRUE,TRUE)
+#Se observa como 5 iteraciones son suficientes para un buen modelo de boosting.
+varplot(modelo.ada)
+
+#Redes Neuronales
+modelo.nnet<-nnet(edibility~.,data=taprendizaje,size = 4, rang = 0.1,decay = 5e-4, maxit = 200,trace=FALSE)
+modelo.nnet
+```
+
+
+####e) Predicción y matriz de confusión
+```{r, fig.align='center'}
+#K-Vecinos
+prediccion<-predict(modelo.kknn,ttesting[,-1])
+## Matriz de Confusion
+MC.kknn<-table(ttesting[,1],prediccion)
+MC.kknn
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.kknn)))/sum(MC.kknn)
+acierto
+error<-1-acierto
+error
+
+#Bayes
+prediccion<-predict(modelo.bayes,ttesting[,-1])
+## Matriz de Confusion
+MC.bayes<-table(ttesting[,1],prediccion)
+MC.bayes
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.bayes)))/sum(MC.bayes)
+acierto
+error<-1-acierto
+error
+
+#Máquinas de Soporte Vectorial
+prediccion<-predict(modelo.svm.lineal,ttesting[,-1])
+## Matriz de Confusion
+MC.svm.lineal<-table(ttesting[,1],prediccion)
+MC.svm.lineal
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.svm.lineal)))/sum(MC.svm.lineal)
+acierto
+error<-1-acierto
+error
+
+prediccion<-predict(modelo.svm.radial,ttesting[,-1])
+## Matriz de Confusion
+MC.svm.radial<-table(ttesting[,1],prediccion)
+MC.svm.radial
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.svm.radial)))/sum(MC.svm.radial)
+acierto
+error<-1-acierto
+error
+
+#Tree
+prediccion <- predict(modelo.rpart, ttesting, type='class')
+prp(modelo.rpart,extra=104,branch.type=2, box.col=c("pink", "palegreen3")[modelo.rpart$frame$yval])
+## Matriz de Confusion
+MC.rpart<-table(ttesting$edibility,prediccion)
+MC.rpart
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.rpart)))/sum(MC.rpart)
+acierto
+error<-1-acierto
+error
+
+#Forest
+prediccion<-predict(modelo.forest,ttesting[,-1])
+## Matriz de Confusion
+MC.forest<-table(ttesting$edibility,prediccion)
+MC.forest
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.forest)))/sum(MC.forest)
+acierto
+error<-1-acierto
+error
+
+#Boosting
+prediccion<-predict(modelo.ada,ttesting[,-1])
+## Matriz de Confusion
+MC.boosting<-table(ttesting$edibility,prediccion)
+MC.boosting
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.boosting)))/sum(MC.boosting)
+acierto
+error<-1-acierto
+error
+
+#Redes Neuronales
+prediccion<-predict(modelo.nnet,ttesting[,-1],type="class")
+## Matriz de Confusion
+MC.nnet<-table(ttesting$edibility,prediccion)
+MC.nnet
+## Porcentaje de error y de buena clasificacion
+acierto<-(sum(diag(MC.nnet)))/sum(MC.nnet)
+acierto
+error<-1-acierto
+error
+```
+
+
+####f) Resultados
+```{r}
+df4 <- rbind(lista(MC.kknn), lista(MC.bayes), lista(MC.svm.lineal), lista(MC.svm.radial), lista(MC.rpart), lista(MC.forest), lista(MC.boosting), lista(MC.nnet))
+rownames(df4) <- c("K-Vecinos","Bayes","SVM lineal","SVM radial","Arboles","Random Forest","Boosting","Redes Neuronales")
+df4
+```
+
+Resumen de resultados:
+Este problema en específico se presenta como uno de fácil predicción en donde todos los modelos predicen de manera excelente los datos presentados. Es interesante conocer si debido a que todas las variable predictoras son categóricas, se facilita el modelado y por ende la predicción.
