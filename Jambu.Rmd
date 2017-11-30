@@ -1,6 +1,6 @@
 ---
 title: "Tarea4_pablo_acuna"
-author: "Pablo Acuña Quirós"
+author: "Pablo AcuÃ±a QuirÃ³s"
 output: html_document
 ---
 
@@ -53,10 +53,10 @@ legend("topright",legend = c("Hartigan","Lloyd","Forgy","MacQueen"), col = c("bl
 
 ```
 
-Según mi interpretación con k=4 se estabiliza la variación de la inercia intra clase.
+SegÃºn mi interpretaciÃ³n con k=4 se estabiliza la variaciÃ³n de la inercia intra clase.
 
 
-#### b) Selección de algoritmo para k-medias
+#### b) SelecciÃ³n de algoritmo para k-medias
 ```{r,fig.align='center'}
 Hartigan<-0
 Lloyd<-0
@@ -124,37 +124,37 @@ Forgy/40
 MacQueen/40
 ```
 
-El parámetro nstart toma múltiples configuraciones iniciales y a partir del resultado se reporta el mejor. El agregar éste parámetro estabiliza la variación de la inercia. Se observa además que usando nstart se logra aumentar la inercia inter clase, esto indica que los clusters están mejor definidos y sus individuos más agrupados entre si.
+El parÃ¡metro nstart toma mÃºltiples configuraciones iniciales y a partir del resultado se reporta el mejor. El agregar Ã©ste parÃ¡metro estabiliza la variaciÃ³n de la inercia. Se observa ademÃ¡s que usando nstart se logra aumentar la inercia inter clase, esto indica que los clusters estÃ¡n mejor definidos y sus individuos mÃ¡s agrupados entre si.
 
 
 
 ###**Ejercicio 2**
 
-#### Generación de muestra aleatoria
+#### GeneraciÃ³n de muestra aleatoria
 ```{r}
 datos2 <- read.csv("DatosIngresos.csv", header=TRUE, sep=";", dec=",")
 str(datos2)
-#Dimensión de la tabla original
+#DimensiÃ³n de la tabla original
 summary(datos2$Income)
-#Proporción de la tabla original
+#ProporciÃ³n de la tabla original
 prop.table(summary(datos2$Income))
 muestra <- sample(dim(datos2)[1], 2000, replace = FALSE)
 tmuestra <- datos2[muestra,]
-#Dimensión de la tabla original
+#DimensiÃ³n de la tabla original
 summary(tmuestra$Income)
-#Proporción de la tabla de muetra
+#ProporciÃ³n de la tabla de muetra
 prop.table(summary(tmuestra$Income))
 ```
 
 
-####a) Calibración del modelo ADA 
+####a) CalibraciÃ³n del modelo ADA 
 ```{r,fig.align='center'}
 n <- dim(tmuestra)[1]
 deteccion.mayor.discrete<-rep(0,6)
 deteccion.mayor.real<-rep(0,6)
 deteccion.mayor.gentle<-rep(0,6)
 
-# Validación cruzada 6 veces
+# ValidaciÃ³n cruzada 6 veces
 for(i in 1:6) {
   grupos <- createFolds(1:n,5)
   mayor.discrete<-0
@@ -191,17 +191,17 @@ for(i in 1:6) {
    deteccion.mayor.gentle[i]<-mayor.gentle
 
 }
-plot(deteccion.mayor.discrete, col = "green", type = "b",  ylim = c(min(deteccion.mayor.discrete, deteccion.mayor.real, deteccion.mayor.gentle)-5, max(deteccion.mayor.discrete, deteccion.mayor.real, deteccion.mayor.gentle)+10), main = "Detección de ingreso >50K - ada boosting", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+plot(deteccion.mayor.discrete, col = "green", type = "b",  ylim = c(min(deteccion.mayor.discrete, deteccion.mayor.real, deteccion.mayor.gentle)-5, max(deteccion.mayor.discrete, deteccion.mayor.real, deteccion.mayor.gentle)+10), main = "DetecciÃ³n de ingreso >50K - ada boosting", xlab = "NÃºmero de iteraciÃ³n", ylab = "Cantidad de I>50K detectados")
 points(deteccion.mayor.real, col = "blue", type = "b")
 points(deteccion.mayor.gentle, col = "red", type = "b")
 legend("topright", legend = c("Discrete","Real","Gentle"), col = c("green", 
     "blue","red"), lty = 1, lwd = 1)
 
 ```
-No es posible determinar con claridad ya que la variación en la detección es similar para los tres métodos. Hasta éste punto se podría decir que los tres modelos producen valores parecidos y el algoritmo real es ligeramente mejor .
+No es posible determinar con claridad ya que la variaciÃ³n en la detecciÃ³n es similar para los tres mÃ©todos. Hasta Ã©ste punto se podrÃ­a decir que los tres modelos producen valores parecidos y el algoritmo real es ligeramente mejor .
 
 
-####b) Cálculo de errores globales 
+####b) CÃ¡lculo de errores globales 
 ```{r,fig.align='center'}
 n <- dim(tmuestra)[1]
 deteccion.error.discrete<-rep(0,6)
@@ -243,7 +243,7 @@ for(i in 1:6) {
    deteccion.error.gentle[i]<-error.gentle/5
 
 }
-plot(deteccion.error.discrete, col = "green", type = "b",  ylim = c(min(deteccion.error.discrete, deteccion.error.real, deteccion.error.gentle), max(deteccion.error.discrete, deteccion.error.real, deteccion.error.gentle)+1), main = "Detección del ERROR - ada boosting", xlab = "Número de iteración", ylab = "ERROR Cometido")
+plot(deteccion.error.discrete, col = "green", type = "b",  ylim = c(min(deteccion.error.discrete, deteccion.error.real, deteccion.error.gentle), max(deteccion.error.discrete, deteccion.error.real, deteccion.error.gentle)+1), main = "DetecciÃ³n del ERROR - ada boosting", xlab = "NÃºmero de iteraciÃ³n", ylab = "ERROR Cometido")
 points(deteccion.error.real, col = "blue", type = "b")
 points(deteccion.error.gentle, col = "red", type = "b")
 
@@ -253,28 +253,28 @@ legend("topright", legend = c("Discrete","Real","Gentle"), col = c("green","blue
 El algoritmo Real es el que minimiza el error global a lo largo de las 6 iteraciones.
 
 
-####d) Selección de método
-La detección de errores es muy similar, sin embargo el algoritmo Real es el que minimiza el error global por lo tanto basado en la información anterior se a  éste como el algoritmo a utilizar.
+####d) SelecciÃ³n de mÃ©todo
+La detecciÃ³n de errores es muy similar, sin embargo el algoritmo Real es el que minimiza el error global por lo tanto basado en la informaciÃ³n anterior se a  Ã©ste como el algoritmo a utilizar.
 
 
 
 
 ###**Ejercicio 3**
 
-Para este ejercicio se va a utilizar la muestra de 2000 indiviuos utilizada en el ejercicio 2 (tmuestra). Debido a que ya se calibró el método de Potenciación, se va a proceder a calibrar el resto de métodos, a saber, Bayes, SVM, Arboles, Bosques y Redes Neuronales.
+Para este ejercicio se va a utilizar la muestra de 2000 indiviuos utilizada en el ejercicio 2 (tmuestra). Debido a que ya se calibrÃ³ el mÃ©todo de PotenciaciÃ³n, se va a proceder a calibrar el resto de mÃ©todos, a saber, Bayes, SVM, Arboles, Bosques y Redes Neuronales.
 
-####a) Predicción Income > 50K
+####a) PredicciÃ³n Income > 50K
 ```{r,fig.align='center'}
 n <- dim(tmuestra)[1]
 
-#Selección del mejor método de Bayes 
-#Según lo indicado en http://www.learnbymarketing.com/tutorials/naive-bayes-in-r/ se va a variar el parámetro Laplace para ver si tiene algún efecto.
+#SelecciÃ³n del mejor mÃ©todo de Bayes 
+#SegÃºn lo indicado en http://www.learnbymarketing.com/tutorials/naive-bayes-in-r/ se va a variar el parÃ¡metro Laplace para ver si tiene algÃºn efecto.
 
 deteccion.mayor.laplace.0<-rep(0,6)
 deteccion.mayor.laplace.1<-rep(0,6)
 deteccion.mayor.laplace.3<-rep(0,6)
 
-# Validación cruzada 6 veces
+# ValidaciÃ³n cruzada 6 veces
 for(i in 1:6) {
   grupos <- createFolds(1:n,5)
   mayor.laplace.0<-0
@@ -310,7 +310,7 @@ for(i in 1:6) {
    deteccion.mayor.laplace.3[i]<-mayor.laplace.3
 
 }
-plot(deteccion.mayor.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.mayor.laplace.0, deteccion.mayor.laplace.1, deteccion.mayor.laplace.3)-5, max(deteccion.mayor.laplace.0, deteccion.mayor.laplace.1, deteccion.mayor.laplace.3)+5), main = "Detección de ingreso >50K", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+plot(deteccion.mayor.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.mayor.laplace.0, deteccion.mayor.laplace.1, deteccion.mayor.laplace.3)-5, max(deteccion.mayor.laplace.0, deteccion.mayor.laplace.1, deteccion.mayor.laplace.3)+5), main = "DetecciÃ³n de ingreso >50K", xlab = "NÃºmero de iteraciÃ³n", ylab = "Cantidad de I>50K detectados")
 points(deteccion.mayor.laplace.1, col = "blue", type = "b")
 points(deteccion.mayor.laplace.3, col = "red", type = "b")
 legend("topright", legend = c("Laplace 0","Laplace 1","Laplace 3"), col = c("green", 
@@ -319,14 +319,14 @@ legend("topright", legend = c("Laplace 0","Laplace 1","Laplace 3"), col = c("gre
 
 
 
-#Selección del mejor método de SVM
+#SelecciÃ³n del mejor mÃ©todo de SVM
 
 deteccion.mayor.radial<-rep(0,6)
 deteccion.mayor.lineal<-rep(0,6)
 deteccion.mayor.polynomial<-rep(0,6)
 deteccion.mayor.sigmoid<-rep(0,6)
 
-# Validación cruzada 6 veces
+# ValidaciÃ³n cruzada 6 veces
 for(i in 1:6) {
   grupos <- createFolds(1:n,5)
   mayor.radial<-0
@@ -370,7 +370,7 @@ for(i in 1:6) {
    deteccion.mayor.sigmoid[i]<-mayor.sigmoid
 
 }
-plot(deteccion.mayor.radial, col = "green", type = "b",  ylim = c(min(deteccion.mayor.radial,deteccion.mayor.lineal,deteccion.mayor.polynomial,deteccion.mayor.sigmoid)-5, max(deteccion.mayor.radial,deteccion.mayor.lineal,deteccion.mayor.polynomial,deteccion.mayor.sigmoid)+150), main = "Detección de ingreso >50K - SVM", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+plot(deteccion.mayor.radial, col = "green", type = "b",  ylim = c(min(deteccion.mayor.radial,deteccion.mayor.lineal,deteccion.mayor.polynomial,deteccion.mayor.sigmoid)-5, max(deteccion.mayor.radial,deteccion.mayor.lineal,deteccion.mayor.polynomial,deteccion.mayor.sigmoid)+150), main = "DetecciÃ³n de ingreso >50K - SVM", xlab = "NÃºmero de iteraciÃ³n", ylab = "Cantidad de I>50K detectados")
 points(deteccion.mayor.lineal, col = "blue", type = "b")
 points(deteccion.mayor.polynomial, col = "red", type = "b")
 points(deteccion.mayor.sigmoid, col = "cyan", type = "b")
@@ -380,14 +380,14 @@ legend("topright", legend = c("Radial","Lineal","Polynomial","Sigmoid"), col = c
 
 
 
-#Selección del mejor método de Arbol
-#Se va a variar el parámetro maxdepth (Profundidad Máxima)
+#SelecciÃ³n del mejor mÃ©todo de Arbol
+#Se va a variar el parÃ¡metro maxdepth (Profundidad MÃ¡xima)
 
 deteccion.mayor.arbol.1<-rep(0,6)
 deteccion.mayor.arbol.2<-rep(0,6)
 deteccion.mayor.arbol.3<-rep(0,6)
 
-# Validación cruzada 6 veces
+# ValidaciÃ³n cruzada 6 veces
 for(i in 1:6) {
   grupos <- createFolds(1:n,5)
   mayor.arbol.1<-0
@@ -423,7 +423,7 @@ for(i in 1:6) {
    deteccion.mayor.arbol.3[i]<-mayor.arbol.3
 }
 
-plot(deteccion.mayor.arbol.1, col = "green", type = "b",  ylim = c(min(deteccion.mayor.arbol.1,deteccion.mayor.arbol.2,deteccion.mayor.arbol.3)-5, max(deteccion.mayor.arbol.1,deteccion.mayor.arbol.2,deteccion.mayor.arbol.3)+5), main = "Detección de ingreso >50K - Arbol", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+plot(deteccion.mayor.arbol.1, col = "green", type = "b",  ylim = c(min(deteccion.mayor.arbol.1,deteccion.mayor.arbol.2,deteccion.mayor.arbol.3)-5, max(deteccion.mayor.arbol.1,deteccion.mayor.arbol.2,deteccion.mayor.arbol.3)+5), main = "DetecciÃ³n de ingreso >50K - Arbol", xlab = "NÃºmero de iteraciÃ³n", ylab = "Cantidad de I>50K detectados")
 points(deteccion.mayor.arbol.2, col = "blue", type = "b")
 points(deteccion.mayor.arbol.3, col = "red", type = "b")
 legend("topright", legend = c("5","15","25"), col = c("green", 
@@ -432,14 +432,14 @@ legend("topright", legend = c("5","15","25"), col = c("green",
 
 
 
-#Selección del mejor método de Bosques
-#Se va a variar el parámetro ntree (Número de árboles)
+#SelecciÃ³n del mejor mÃ©todo de Bosques
+#Se va a variar el parÃ¡metro ntree (NÃºmero de Ã¡rboles)
 
 deteccion.mayor.bosques.500<-rep(0,6)
 deteccion.mayor.bosques.750<-rep(0,6)
 deteccion.mayor.bosques.1000<-rep(0,6)
 
-# Validación cruzada 6 veces
+# ValidaciÃ³n cruzada 6 veces
 for(i in 1:6) {
   grupos <- createFolds(1:n,5)
   mayor.bosques.500<-0
@@ -475,7 +475,7 @@ for(i in 1:6) {
    deteccion.mayor.bosques.1000[i]<-mayor.bosques.1000
 }
 
-plot(deteccion.mayor.bosques.500, col = "green", type = "b",  ylim = c(min(deteccion.mayor.bosques.500,deteccion.mayor.bosques.750,deteccion.mayor.bosques.1000)-5, max(deteccion.mayor.bosques.500,deteccion.mayor.bosques.750,deteccion.mayor.bosques.1000)+5), main = "Detección de ingreso >50K - Bosques", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+plot(deteccion.mayor.bosques.500, col = "green", type = "b",  ylim = c(min(deteccion.mayor.bosques.500,deteccion.mayor.bosques.750,deteccion.mayor.bosques.1000)-5, max(deteccion.mayor.bosques.500,deteccion.mayor.bosques.750,deteccion.mayor.bosques.1000)+5), main = "DetecciÃ³n de ingreso >50K - Bosques", xlab = "NÃºmero de iteraciÃ³n", ylab = "Cantidad de I>50K detectados")
 points(deteccion.mayor.bosques.750, col = "blue", type = "b")
 points(deteccion.mayor.bosques.1000, col = "red", type = "b")
 legend("topright", legend = c("500","750","1000"), col = c("green", 
@@ -484,14 +484,14 @@ legend("topright", legend = c("500","750","1000"), col = c("green",
 
 
 
-#Selección del mejor método de Redes Neuronales
-#Se va a variar el parámetro size (Número de capas ocultas)
+#SelecciÃ³n del mejor mÃ©todo de Redes Neuronales
+#Se va a variar el parÃ¡metro size (NÃºmero de capas ocultas)
 
 deteccion.mayor.redes.1<-rep(0,6)
 deteccion.mayor.redes.2<-rep(0,6)
 deteccion.mayor.redes.3<-rep(0,6)
 
-# Validación cruzada 6 veces
+# ValidaciÃ³n cruzada 6 veces
 for(i in 1:6) {
   grupos <- createFolds(1:n,5)
   mayor.redes.1<-0
@@ -536,7 +536,7 @@ for(i in 1:6) {
    deteccion.mayor.redes.3[i]<-mayor.redes.3
 }
 
-plot(deteccion.mayor.redes.1, col = "green", type = "b",  ylim = c(min(deteccion.mayor.redes.1,deteccion.mayor.redes.2,deteccion.mayor.redes.3)-5, max(deteccion.mayor.redes.1,deteccion.mayor.redes.2,deteccion.mayor.redes.3)+5), main = "Detección de ingreso >50K - Redes Neuronales", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+plot(deteccion.mayor.redes.1, col = "green", type = "b",  ylim = c(min(deteccion.mayor.redes.1,deteccion.mayor.redes.2,deteccion.mayor.redes.3)-5, max(deteccion.mayor.redes.1,deteccion.mayor.redes.2,deteccion.mayor.redes.3)+5), main = "DetecciÃ³n de ingreso >50K - Redes Neuronales", xlab = "NÃºmero de iteraciÃ³n", ylab = "Cantidad de I>50K detectados")
 points(deteccion.mayor.redes.2, col = "blue", type = "b")
 points(deteccion.mayor.redes.3, col = "red", type = "b")
 legend("topright", legend = c("5","7","9"), col = c("green","blue","red"), lty = 1, lwd = 1)
@@ -544,13 +544,13 @@ legend("topright", legend = c("5","7","9"), col = c("green","blue","red"), lty =
 
 
 
-#Selección del mejor método de K-vecinos
+#SelecciÃ³n del mejor mÃ©todo de K-vecinos
 
 deteccion.mayor.k.10<-rep(0,6)
 deteccion.mayor.k.25<-rep(0,6)
 deteccion.mayor.k.50<-rep(0,6)
 
-# Validación cruzada 6 veces
+# ValidaciÃ³n cruzada 6 veces
 for(i in 1:6) {
   grupos <- createFolds(1:n,5)
   mayor.k.10<-0
@@ -588,7 +588,7 @@ for(i in 1:6) {
 
 }
 
-plot(deteccion.mayor.k.10, col = "green", type = "b",  ylim = c(min(deteccion.mayor.k.10,deteccion.mayor.k.25,deteccion.mayor.k.50)-5, max(deteccion.mayor.k.10,deteccion.mayor.k.25,deteccion.mayor.k.50)+5), main = "Detección de ingreso >50K - K-vecinos", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+plot(deteccion.mayor.k.10, col = "green", type = "b",  ylim = c(min(deteccion.mayor.k.10,deteccion.mayor.k.25,deteccion.mayor.k.50)-5, max(deteccion.mayor.k.10,deteccion.mayor.k.25,deteccion.mayor.k.50)+5), main = "DetecciÃ³n de ingreso >50K - K-vecinos", xlab = "NÃºmero de iteraciÃ³n", ylab = "Cantidad de I>50K detectados")
 points(deteccion.mayor.k.25, col = "blue", type = "b")
 points(deteccion.mayor.k.50, col = "red", type = "b")
 legend("topright", legend = c("10","25","50"), col = c("green", 
@@ -597,7 +597,7 @@ legend("topright", legend = c("10","25","50"), col = c("green",
 
 
 
-#De acuerdo al análisis anterior se utilizarán los métodos con los siguientes parámetros
+#De acuerdo al anÃ¡lisis anterior se utilizarÃ¡n los mÃ©todos con los siguientes parÃ¡metros
 
 #Bayes - Lapace=0
 #SVM - kernel="linear"
@@ -607,7 +607,7 @@ legend("topright", legend = c("10","25","50"), col = c("green",
 #Redes Neuronales - size=9
 #K-vecinos - kmax=25
 
-plot(deteccion.mayor.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.mayor.laplace.0,deteccion.mayor.lineal,deteccion.mayor.arbol.2,deteccion.mayor.bosques.500,deteccion.mayor.discrete,deteccion.mayor.redes.3,deteccion.mayor.k.25)-5, max(deteccion.mayor.laplace.0,deteccion.mayor.lineal,deteccion.mayor.arbol.2,deteccion.mayor.bosques.500,deteccion.mayor.real,deteccion.mayor.redes.3,deteccion.mayor.k.25)+5), main = "Detección de ingreso >50K", xlab = "Número de iteración", ylab = "Cantidad de I>50K detectados")
+plot(deteccion.mayor.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.mayor.laplace.0,deteccion.mayor.lineal,deteccion.mayor.arbol.2,deteccion.mayor.bosques.500,deteccion.mayor.discrete,deteccion.mayor.redes.3,deteccion.mayor.k.25)-5, max(deteccion.mayor.laplace.0,deteccion.mayor.lineal,deteccion.mayor.arbol.2,deteccion.mayor.bosques.500,deteccion.mayor.real,deteccion.mayor.redes.3,deteccion.mayor.k.25)+5), main = "DetecciÃ³n de ingreso >50K", xlab = "NÃºmero de iteraciÃ³n", ylab = "Cantidad de I>50K detectados")
 points(deteccion.mayor.lineal, col = "blue", type = "b")
 points(deteccion.mayor.arbol.2, col = "red", type = "b")
 points(deteccion.mayor.bosques.500, col = "cyan", type = "b")
@@ -617,21 +617,21 @@ points(deteccion.mayor.k.25, col = "grey", type = "b")
 legend("bottomright", legend = c("Bayes","SVM","Arbol","Forest","ADA","Redes N.","K-vecinos"), col = c("green", 
     "blue","red","cyan","magenta","orange","grey"), lty = 1, lwd = 1)
 ```
-Aunque es difícil determinar los tres mejores modelos, se puede decir a partir de la gráfica que son: K-vecinos, Ada boosting y Arboles.
+Aunque es difÃ­cil determinar los tres mejores modelos, se puede decir a partir de la grÃ¡fica que son: K-vecinos, Ada boosting y Arboles.
 
 
 ####b) Errores globales
 ```{r,fig.align='center'}
 n <- dim(tmuestra)[1]
 
-#Selección del mejor método de Bayes 
-#Según lo indicado en http://www.learnbymarketing.com/tutorials/naive-bayes-in-r/ se va a variar el parámetro Laplace para ver si tiene algún efecto.
+#SelecciÃ³n del mejor mÃ©todo de Bayes 
+#SegÃºn lo indicado en http://www.learnbymarketing.com/tutorials/naive-bayes-in-r/ se va a variar el parÃ¡metro Laplace para ver si tiene algÃºn efecto.
 
 deteccion.error.laplace.0<-rep(0,6)
 deteccion.error.laplace.1<-rep(0,6)
 deteccion.error.laplace.3<-rep(0,6)
 
-# Validación cruzada 6 veces
+# ValidaciÃ³n cruzada 6 veces
 for(i in 1:6) {
   grupos <- createFolds(1:n,5)
   error.laplace.0<-0
@@ -668,7 +668,7 @@ for(i in 1:6) {
 
 }
 
-plot(deteccion.error.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.error.laplace.0, deteccion.error.laplace.1, deteccion.error.laplace.3)-5, max(deteccion.error.laplace.0, deteccion.error.laplace.1, deteccion.error.laplace.3)+5), main = "Detección del ERROR", xlab = "Número de iteración", ylab = "ERROR cometido")
+plot(deteccion.error.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.error.laplace.0, deteccion.error.laplace.1, deteccion.error.laplace.3)-5, max(deteccion.error.laplace.0, deteccion.error.laplace.1, deteccion.error.laplace.3)+5), main = "DetecciÃ³n del ERROR", xlab = "NÃºmero de iteraciÃ³n", ylab = "ERROR cometido")
 points(deteccion.error.laplace.1, col = "blue", type = "b")
 points(deteccion.error.laplace.3, col = "red", type = "b")
 legend("topright", legend = c("Laplace 0","Laplace 1","Laplace 3"), col = c("green", 
@@ -678,14 +678,14 @@ legend("topright", legend = c("Laplace 0","Laplace 1","Laplace 3"), col = c("gre
 
 
 
-#Selección del mejor método de SVM
+#SelecciÃ³n del mejor mÃ©todo de SVM
 
 deteccion.error.radial<-rep(0,6)
 deteccion.error.lineal<-rep(0,6)
 deteccion.error.polynomial<-rep(0,6)
 deteccion.error.sigmoid<-rep(0,6)
 
-# Validación cruzada 6 veces
+# ValidaciÃ³n cruzada 6 veces
 for(i in 1:6) {
   grupos <- createFolds(1:n,5)
   error.radial<-0
@@ -730,7 +730,7 @@ for(i in 1:6) {
 
 }
 
-plot(deteccion.error.radial, col = "green", type = "b",  ylim = c(min(deteccion.error.radial,deteccion.error.lineal,deteccion.error.polynomial,deteccion.error.sigmoid)-5, max(deteccion.error.radial,deteccion.error.lineal,deteccion.error.polynomial,deteccion.error.sigmoid)+5), main = "Detección del ERROR - SVM", xlab = "Número de iteración", ylab = "Error cometido")
+plot(deteccion.error.radial, col = "green", type = "b",  ylim = c(min(deteccion.error.radial,deteccion.error.lineal,deteccion.error.polynomial,deteccion.error.sigmoid)-5, max(deteccion.error.radial,deteccion.error.lineal,deteccion.error.polynomial,deteccion.error.sigmoid)+5), main = "DetecciÃ³n del ERROR - SVM", xlab = "NÃºmero de iteraciÃ³n", ylab = "Error cometido")
 points(deteccion.error.lineal, col = "blue", type = "b")
 points(deteccion.error.polynomial, col = "red", type = "b")
 points(deteccion.error.sigmoid, col = "cyan", type = "b")
@@ -741,14 +741,14 @@ legend("topright", legend = c("Radial","Lineal","Polynomial","Sigmoid"), col = c
 
 
 
-#Selección del mejor método de Arbol
-#Se va a variar el parámetro maxdepth (Profundidad Máxima)
+#SelecciÃ³n del mejor mÃ©todo de Arbol
+#Se va a variar el parÃ¡metro maxdepth (Profundidad MÃ¡xima)
 
 deteccion.error.arbol.1<-rep(0,6)
 deteccion.error.arbol.2<-rep(0,6)
 deteccion.error.arbol.3<-rep(0,6)
 
-# Validación cruzada 6 veces
+# ValidaciÃ³n cruzada 6 veces
 for(i in 1:6) {
   grupos <- createFolds(1:n,5)
   error.arbol.1<-0
@@ -784,7 +784,7 @@ for(i in 1:6) {
    deteccion.error.arbol.3[i]<-error.arbol.3/5
 }
 
-plot(deteccion.error.arbol.1, col = "green", type = "b",  ylim = c(min(deteccion.error.arbol.1,deteccion.error.arbol.2,deteccion.error.arbol.3)-5, max(deteccion.error.arbol.1,deteccion.error.arbol.2,deteccion.error.arbol.3)+5), main = "Detección del ERROR - Arbol", xlab = "Número de iteración", ylab = "Error cometido")
+plot(deteccion.error.arbol.1, col = "green", type = "b",  ylim = c(min(deteccion.error.arbol.1,deteccion.error.arbol.2,deteccion.error.arbol.3)-5, max(deteccion.error.arbol.1,deteccion.error.arbol.2,deteccion.error.arbol.3)+5), main = "DetecciÃ³n del ERROR - Arbol", xlab = "NÃºmero de iteraciÃ³n", ylab = "Error cometido")
 points(deteccion.error.arbol.2, col = "blue", type = "b")
 points(deteccion.error.arbol.3, col = "red", type = "b")
 legend("topright", legend = c("5","15","25"), col = c("green", 
@@ -794,15 +794,15 @@ legend("topright", legend = c("5","15","25"), col = c("green",
 
 
 
-#Selección del mejor método de Bosques
-#Se va a variar el parámetro ntree (Número de árboles)
+#SelecciÃ³n del mejor mÃ©todo de Bosques
+#Se va a variar el parÃ¡metro ntree (NÃºmero de Ã¡rboles)
 
 
 deteccion.error.bosques.500<-rep(0,6)
 deteccion.error.bosques.750<-rep(0,6)
 deteccion.error.bosques.1000<-rep(0,6)
 
-# Validación cruzada 6 veces
+# ValidaciÃ³n cruzada 6 veces
 for(i in 1:6) {
   grupos <- createFolds(1:n,5)
   error.bosques.500<-0
@@ -838,7 +838,7 @@ for(i in 1:6) {
    deteccion.error.bosques.1000[i]<-error.bosques.1000/5
 }
 
-plot(deteccion.error.bosques.500, col = "green", type = "b",  ylim = c(min(deteccion.error.bosques.500,deteccion.error.bosques.750,deteccion.error.bosques.1000)-5, max(deteccion.error.bosques.500,deteccion.error.bosques.750,deteccion.error.bosques.1000)+5), main = "Detección del ERROR - Bosques", xlab = "Número de iteración", ylab = "Error cometido")
+plot(deteccion.error.bosques.500, col = "green", type = "b",  ylim = c(min(deteccion.error.bosques.500,deteccion.error.bosques.750,deteccion.error.bosques.1000)-5, max(deteccion.error.bosques.500,deteccion.error.bosques.750,deteccion.error.bosques.1000)+5), main = "DetecciÃ³n del ERROR - Bosques", xlab = "NÃºmero de iteraciÃ³n", ylab = "Error cometido")
 points(deteccion.error.bosques.750, col = "blue", type = "b")
 points(deteccion.error.bosques.1000, col = "red", type = "b")
 legend("topright", legend = c("500","750","1000"), col = c("green", 
@@ -847,14 +847,14 @@ legend("topright", legend = c("500","750","1000"), col = c("green",
 
 
 
-#Selección del mejor método de Redes Neuronales
-#Se va a variar el parámetro size (Número de capas ocultas)
+#SelecciÃ³n del mejor mÃ©todo de Redes Neuronales
+#Se va a variar el parÃ¡metro size (NÃºmero de capas ocultas)
 
 deteccion.error.redes.1<-rep(0,6)
 deteccion.error.redes.2<-rep(0,6)
 deteccion.error.redes.3<-rep(0,6)
 
-# Validación cruzada 6 veces
+# ValidaciÃ³n cruzada 6 veces
 for(i in 1:6) {
   grupos <- createFolds(1:n,5)
   error.redes.1<-0
@@ -899,7 +899,7 @@ for(i in 1:6) {
    deteccion.error.redes.3[i]<-error.redes.3/5
 }
 
-plot(deteccion.error.redes.1, col = "green", type = "b",  ylim = c(min(deteccion.error.redes.1,deteccion.error.redes.2,deteccion.error.redes.3)-5, max(deteccion.error.redes.1,deteccion.error.redes.2,deteccion.error.redes.3)+5), main = "Detección del ERROR - Redes Neuronales", xlab = "Número de iteración", ylab = "Error cometido")
+plot(deteccion.error.redes.1, col = "green", type = "b",  ylim = c(min(deteccion.error.redes.1,deteccion.error.redes.2,deteccion.error.redes.3)-5, max(deteccion.error.redes.1,deteccion.error.redes.2,deteccion.error.redes.3)+5), main = "DetecciÃ³n del ERROR - Redes Neuronales", xlab = "NÃºmero de iteraciÃ³n", ylab = "Error cometido")
 points(deteccion.error.redes.2, col = "blue", type = "b")
 points(deteccion.error.redes.3, col = "red", type = "b")
 legend("topright", legend = c("5","7","9"), col = c("green","blue","red"), lty = 1, lwd = 1)
@@ -909,13 +909,13 @@ legend("topright", legend = c("5","7","9"), col = c("green","blue","red"), lty =
 
 
 
-#Selección del mejor método de K-vecinos
+#SelecciÃ³n del mejor mÃ©todo de K-vecinos
 
 deteccion.error.k.10<-rep(0,6)
 deteccion.error.k.25<-rep(0,6)
 deteccion.error.k.50<-rep(0,6)
 
-# Validación cruzada 6 veces
+# ValidaciÃ³n cruzada 6 veces
 for(i in 1:6) {
   grupos <- createFolds(1:n,5)
   error.k.10<-0
@@ -953,7 +953,7 @@ for(i in 1:6) {
 
 }
 
-plot(deteccion.error.k.10, col = "green", type = "b",  ylim = c(min(deteccion.error.k.10,deteccion.error.k.25,deteccion.error.k.50)-5, max(deteccion.error.k.10,deteccion.error.k.25,deteccion.error.k.50)+5), main = "Detección del ERROR - K-vecinos", xlab = "Número de iteración", ylab = "Error cometido")
+plot(deteccion.error.k.10, col = "green", type = "b",  ylim = c(min(deteccion.error.k.10,deteccion.error.k.25,deteccion.error.k.50)-5, max(deteccion.error.k.10,deteccion.error.k.25,deteccion.error.k.50)+5), main = "DetecciÃ³n del ERROR - K-vecinos", xlab = "NÃºmero de iteraciÃ³n", ylab = "Error cometido")
 points(deteccion.error.k.25, col = "blue", type = "b")
 points(deteccion.error.k.50, col = "red", type = "b")
 legend("topright", legend = c("10","25","50"), col = c("green", 
@@ -962,7 +962,7 @@ legend("topright", legend = c("10","25","50"), col = c("green",
 
 
 
-#De acuerdo al análisis anterior se utilizarán los métodos con los siguientes parámetros
+#De acuerdo al anÃ¡lisis anterior se utilizarÃ¡n los mÃ©todos con los siguientes parÃ¡metros
 
 #Bayes - Lapace=0
 #SVM - kernel="linear"
@@ -972,7 +972,7 @@ legend("topright", legend = c("10","25","50"), col = c("green",
 #Redes Neuronales - size=9
 #K-vecinos - kmax=25
 
-plot(deteccion.error.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.error.laplace.0,deteccion.error.lineal,deteccion.error.arbol.2,deteccion.error.bosques.500,deteccion.error.discrete,deteccion.error.redes.3,deteccion.error.k.25)-5, max(deteccion.error.laplace.0,deteccion.error.lineal,deteccion.error.arbol.2,deteccion.error.bosques.500,deteccion.error.real,deteccion.error.redes.3,deteccion.error.k.25)+5), main = "Detección del ERROR", xlab = "Número de iteración", ylab = "Error cometido")
+plot(deteccion.error.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.error.laplace.0,deteccion.error.lineal,deteccion.error.arbol.2,deteccion.error.bosques.500,deteccion.error.discrete,deteccion.error.redes.3,deteccion.error.k.25)-5, max(deteccion.error.laplace.0,deteccion.error.lineal,deteccion.error.arbol.2,deteccion.error.bosques.500,deteccion.error.real,deteccion.error.redes.3,deteccion.error.k.25)+5), main = "DetecciÃ³n del ERROR", xlab = "NÃºmero de iteraciÃ³n", ylab = "Error cometido")
 points(deteccion.error.lineal, col = "blue", type = "b")
 points(deteccion.error.arbol.2, col = "red", type = "b")
 points(deteccion.error.bosques.500, col = "cyan", type = "b")
@@ -981,30 +981,30 @@ points(deteccion.error.redes.3, col = "orange", type = "b")
 points(deteccion.error.k.25, col = "grey", type = "b")
 legend("topright", legend = c("Bayes","SVM","Arbol","Forest","ADA","Redes N.","K-vecinos"), col = c("green","blue","red","cyan","magenta","orange","grey"), lty = 1, lwd = 1)
 ```
-Aunque es difícil detrminar los tres mejores modelos, se puede decir a partir de la gráfica que son: Bayes, SVM, Arbol.
+Aunque es difÃ­cil detrminar los tres mejores modelos, se puede decir a partir de la grÃ¡fica que son: Bayes, SVM, Arbol.
 
 
 ####c) Errores globales
-De acuerdo a lo anterior utilizaría el método de SVM ya que minimiza bastante bien el error global y tiene poca variación a lo largo de las 6 variaciones cruzadas. 
+De acuerdo a lo anterior utilizarÃ­a el mÃ©todo de SVM ya que minimiza bastante bien el error global y tiene poca variaciÃ³n a lo largo de las 6 variaciones cruzadas. 
 
 
 
 ###**Ejercicio 4**
 
 #### Carga de datos
-Debido a lo desbalanceado del problema se va a hacer uso de toda la tabla de datos para la selección y caliubración del modelo.
+Debido a lo desbalanceado del problema se va a hacer uso de toda la tabla de datos para la selecciÃ³n y caliubraciÃ³n del modelo.
 ```{r}
 datos4 <- read.csv("SegurosV2016.csv", header=TRUE, sep=";", dec=",")
 str(datos4)
-#Dimensión de la tabla original
+#DimensiÃ³n de la tabla original
 summary(datos4$Fraude)
-#Proporción de la tabla original
+#ProporciÃ³n de la tabla original
 prop.table(summary(datos4$Fraude))
 
 ```
 
 
-####Calibración de los métodos
+####CalibraciÃ³n de los mÃ©todos
 ```{r,fig.align='center'}
 n <- dim(datos4)[1]
 
@@ -1056,7 +1056,7 @@ deteccion.error.gentle<-rep(0,6)
 
 
 
-# Validación cruzada 6 veces
+# ValidaciÃ³n cruzada 6 veces
 for(i in 1:6) {
   grupos <- createFolds(1:n,5)
   mayor.laplace.0<-0
@@ -1330,43 +1330,43 @@ for(i in 1:6) {
 
 
 ```{r,fig.align='center'}
-plot(deteccion.mayor.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.mayor.laplace.0, deteccion.mayor.laplace.1, deteccion.mayor.laplace.3)-5, max(deteccion.mayor.laplace.0, deteccion.mayor.laplace.1, deteccion.mayor.laplace.3)+5), main = "Detección de fraude", xlab = "Número de iteración", ylab = "Cantidad de fraudes detectados")
+plot(deteccion.mayor.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.mayor.laplace.0, deteccion.mayor.laplace.1, deteccion.mayor.laplace.3)-5, max(deteccion.mayor.laplace.0, deteccion.mayor.laplace.1, deteccion.mayor.laplace.3)+5), main = "DetecciÃ³n de fraude", xlab = "NÃºmero de iteraciÃ³n", ylab = "Cantidad de fraudes detectados")
 points(deteccion.mayor.laplace.1, col = "blue", type = "b")
 points(deteccion.mayor.laplace.3, col = "red", type = "b")
 legend("topright", legend = c("Laplace 0","Laplace 1","Laplace 3"), col = c("green", 
     "blue","red"), lty = 1, lwd = 1)
 
-plot(deteccion.mayor.radial, col = "green", type = "b",  ylim = c(min(deteccion.mayor.radial,deteccion.mayor.lineal,deteccion.mayor.polynomial,deteccion.mayor.sigmoid)-5, max(deteccion.mayor.radial,deteccion.mayor.lineal,deteccion.mayor.polynomial,deteccion.mayor.sigmoid)+5), main = "Detección de fraude - SVM", xlab = "Número de iteración", ylab = "Cantidad de fraudes detectados")
+plot(deteccion.mayor.radial, col = "green", type = "b",  ylim = c(min(deteccion.mayor.radial,deteccion.mayor.lineal,deteccion.mayor.polynomial,deteccion.mayor.sigmoid)-5, max(deteccion.mayor.radial,deteccion.mayor.lineal,deteccion.mayor.polynomial,deteccion.mayor.sigmoid)+5), main = "DetecciÃ³n de fraude - SVM", xlab = "NÃºmero de iteraciÃ³n", ylab = "Cantidad de fraudes detectados")
 points(deteccion.mayor.lineal, col = "blue", type = "b")
 points(deteccion.mayor.polynomial, col = "red", type = "b")
 points(deteccion.mayor.sigmoid, col = "cyan", type = "b")
 legend("topright", legend = c("Radial","Lineal","Polynomial","Sigmoid"), col = c("green", 
     "blue","red","cyan"), lty = 1, lwd = 1)
 
-plot(deteccion.mayor.arbol.1, col = "green", type = "b",  ylim = c(min(deteccion.mayor.arbol.1,deteccion.mayor.arbol.2,deteccion.mayor.arbol.3)-5, max(deteccion.mayor.arbol.1,deteccion.mayor.arbol.2,deteccion.mayor.arbol.3)+5), main = "Detección de fraude - Arbol", xlab = "Número de iteración", ylab = "Cantidad de fraudes detectados")
+plot(deteccion.mayor.arbol.1, col = "green", type = "b",  ylim = c(min(deteccion.mayor.arbol.1,deteccion.mayor.arbol.2,deteccion.mayor.arbol.3)-5, max(deteccion.mayor.arbol.1,deteccion.mayor.arbol.2,deteccion.mayor.arbol.3)+5), main = "DetecciÃ³n de fraude - Arbol", xlab = "NÃºmero de iteraciÃ³n", ylab = "Cantidad de fraudes detectados")
 points(deteccion.mayor.arbol.2, col = "blue", type = "b")
 points(deteccion.mayor.arbol.3, col = "red", type = "b")
 legend("topright", legend = c("5","15","25"), col = c("green", 
     "blue","red"), lty = 1, lwd = 1)
 
-plot(deteccion.mayor.bosques.500, col = "green", type = "b",  ylim = c(min(deteccion.mayor.bosques.500,deteccion.mayor.bosques.750,deteccion.mayor.bosques.1000)-5, max(deteccion.mayor.bosques.500,deteccion.mayor.bosques.750,deteccion.mayor.bosques.1000)+5), main = "Detección de fraude - Bosques", xlab = "Número de iteración", ylab = "Cantidad de fraudes detectados")
+plot(deteccion.mayor.bosques.500, col = "green", type = "b",  ylim = c(min(deteccion.mayor.bosques.500,deteccion.mayor.bosques.750,deteccion.mayor.bosques.1000)-5, max(deteccion.mayor.bosques.500,deteccion.mayor.bosques.750,deteccion.mayor.bosques.1000)+5), main = "DetecciÃ³n de fraude - Bosques", xlab = "NÃºmero de iteraciÃ³n", ylab = "Cantidad de fraudes detectados")
 points(deteccion.mayor.bosques.750, col = "blue", type = "b")
 points(deteccion.mayor.bosques.1000, col = "red", type = "b")
 legend("topright", legend = c("500","750","1000"), col = c("green", 
     "blue","red"), lty = 1, lwd = 1)
 
-plot(deteccion.mayor.redes.1, col = "green", type = "b",  ylim = c(min(deteccion.mayor.redes.1,deteccion.mayor.redes.2,deteccion.mayor.redes.3)-5, max(deteccion.mayor.redes.1,deteccion.mayor.redes.2,deteccion.mayor.redes.3)+5), main = "Detección de fraude - Redes Neuronales", xlab = "Número de iteración", ylab = "Cantidad de fraudes detectados")
+plot(deteccion.mayor.redes.1, col = "green", type = "b",  ylim = c(min(deteccion.mayor.redes.1,deteccion.mayor.redes.2,deteccion.mayor.redes.3)-5, max(deteccion.mayor.redes.1,deteccion.mayor.redes.2,deteccion.mayor.redes.3)+5), main = "DetecciÃ³n de fraude - Redes Neuronales", xlab = "NÃºmero de iteraciÃ³n", ylab = "Cantidad de fraudes detectados")
 points(deteccion.mayor.redes.2, col = "blue", type = "b")
 points(deteccion.mayor.redes.3, col = "red", type = "b")
 legend("topright", legend = c("5","7","9"), col = c("green","blue","red"), lty = 1, lwd = 1)
 
-plot(deteccion.mayor.k.10, col = "green", type = "b",  ylim = c(min(deteccion.mayor.k.10,deteccion.mayor.k.25,deteccion.mayor.k.50)-5, max(deteccion.mayor.k.10,deteccion.mayor.k.25,deteccion.mayor.k.50)+5), main = "Detección de fraude - K-vecinos", xlab = "Número de iteración", ylab = "Cantidad de fraudes detectados")
+plot(deteccion.mayor.k.10, col = "green", type = "b",  ylim = c(min(deteccion.mayor.k.10,deteccion.mayor.k.25,deteccion.mayor.k.50)-5, max(deteccion.mayor.k.10,deteccion.mayor.k.25,deteccion.mayor.k.50)+5), main = "DetecciÃ³n de fraude - K-vecinos", xlab = "NÃºmero de iteraciÃ³n", ylab = "Cantidad de fraudes detectados")
 points(deteccion.mayor.k.25, col = "blue", type = "b")
 points(deteccion.mayor.k.50, col = "red", type = "b")
 legend("topright", legend = c("10","25","50"), col = c("green", 
     "blue","red"), lty = 1, lwd = 1)
 
-plot(deteccion.mayor.discrete, col = "green", type = "b",  ylim = c(min(deteccion.mayor.discrete, deteccion.mayor.real, deteccion.mayor.gentle)-5, max(deteccion.mayor.discrete, deteccion.mayor.real, deteccion.mayor.gentle)+10), main = "Detección de fraude - ada boosting", xlab = "Número de iteración", ylab = "Cantidad de fraudes detectados")
+plot(deteccion.mayor.discrete, col = "green", type = "b",  ylim = c(min(deteccion.mayor.discrete, deteccion.mayor.real, deteccion.mayor.gentle)-5, max(deteccion.mayor.discrete, deteccion.mayor.real, deteccion.mayor.gentle)+10), main = "DetecciÃ³n de fraude - ada boosting", xlab = "NÃºmero de iteraciÃ³n", ylab = "Cantidad de fraudes detectados")
 points(deteccion.mayor.real, col = "blue", type = "b")
 points(deteccion.mayor.gentle, col = "red", type = "b")
 legend("topright", legend = c("Discrete","Real","Gentle"), col = c("green", 
@@ -1375,43 +1375,43 @@ legend("topright", legend = c("Discrete","Real","Gentle"), col = c("green",
 
 
 
-plot(deteccion.error.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.error.laplace.0, deteccion.error.laplace.1, deteccion.error.laplace.3)-5, max(deteccion.error.laplace.0, deteccion.error.laplace.1, deteccion.error.laplace.3)+5), main = "Detección del ERROR", xlab = "Número de iteración", ylab = "ERROR cometido")
+plot(deteccion.error.laplace.0, col = "green", type = "b",  ylim = c(min(deteccion.error.laplace.0, deteccion.error.laplace.1, deteccion.error.laplace.3)-5, max(deteccion.error.laplace.0, deteccion.error.laplace.1, deteccion.error.laplace.3)+5), main = "DetecciÃ³n del ERROR", xlab = "NÃºmero de iteraciÃ³n", ylab = "ERROR cometido")
 points(deteccion.error.laplace.1, col = "blue", type = "b")
 points(deteccion.error.laplace.3, col = "red", type = "b")
 legend("topright", legend = c("Laplace 0","Laplace 1","Laplace 3"), col = c("green", 
     "blue","red"), lty = 1, lwd = 1)
 
-plot(deteccion.error.radial, col = "green", type = "b",  ylim = c(min(deteccion.error.radial,deteccion.error.lineal,deteccion.error.polynomial,deteccion.error.sigmoid)-5, max(deteccion.error.radial,deteccion.error.lineal,deteccion.error.polynomial,deteccion.error.sigmoid)+5), main = "Detección del ERROR - SVM", xlab = "Número de iteración", ylab = "Error cometido")
+plot(deteccion.error.radial, col = "green", type = "b",  ylim = c(min(deteccion.error.radial,deteccion.error.lineal,deteccion.error.polynomial,deteccion.error.sigmoid)-5, max(deteccion.error.radial,deteccion.error.lineal,deteccion.error.polynomial,deteccion.error.sigmoid)+5), main = "DetecciÃ³n del ERROR - SVM", xlab = "NÃºmero de iteraciÃ³n", ylab = "Error cometido")
 points(deteccion.error.lineal, col = "blue", type = "b")
 points(deteccion.error.polynomial, col = "red", type = "b")
 points(deteccion.error.sigmoid, col = "cyan", type = "b")
 legend("topright", legend = c("Radial","Lineal","Polynomial","Sigmoid"), col = c("green", 
     "blue","red","cyan"), lty = 1, lwd = 1)
 
-plot(deteccion.error.arbol.1, col = "green", type = "b",  ylim = c(min(deteccion.error.arbol.1,deteccion.error.arbol.2,deteccion.error.arbol.3)-5, max(deteccion.error.arbol.1,deteccion.error.arbol.2,deteccion.error.arbol.3)+5), main = "Detección del ERROR - Arbol", xlab = "Número de iteración", ylab = "Error cometido")
+plot(deteccion.error.arbol.1, col = "green", type = "b",  ylim = c(min(deteccion.error.arbol.1,deteccion.error.arbol.2,deteccion.error.arbol.3)-5, max(deteccion.error.arbol.1,deteccion.error.arbol.2,deteccion.error.arbol.3)+5), main = "DetecciÃ³n del ERROR - Arbol", xlab = "NÃºmero de iteraciÃ³n", ylab = "Error cometido")
 points(deteccion.error.arbol.2, col = "blue", type = "b")
 points(deteccion.error.arbol.3, col = "red", type = "b")
 legend("topright", legend = c("5","15","25"), col = c("green", 
     "blue","red"), lty = 1, lwd = 1)
 
-plot(deteccion.error.bosques.500, col = "green", type = "b",  ylim = c(min(deteccion.error.bosques.500,deteccion.error.bosques.750,deteccion.error.bosques.1000)-5, max(deteccion.error.bosques.500,deteccion.error.bosques.750,deteccion.error.bosques.1000)+5), main = "Detección del ERROR - Bosques", xlab = "Número de iteración", ylab = "Error cometido")
+plot(deteccion.error.bosques.500, col = "green", type = "b",  ylim = c(min(deteccion.error.bosques.500,deteccion.error.bosques.750,deteccion.error.bosques.1000)-5, max(deteccion.error.bosques.500,deteccion.error.bosques.750,deteccion.error.bosques.1000)+5), main = "DetecciÃ³n del ERROR - Bosques", xlab = "NÃºmero de iteraciÃ³n", ylab = "Error cometido")
 points(deteccion.error.bosques.750, col = "blue", type = "b")
 points(deteccion.error.bosques.1000, col = "red", type = "b")
 legend("topright", legend = c("500","750","1000"), col = c("green", 
     "blue","red"), lty = 1, lwd = 1)
 
-plot(deteccion.error.redes.1, col = "green", type = "b",  ylim = c(min(deteccion.error.redes.1,deteccion.error.redes.2,deteccion.error.redes.3)-5, max(deteccion.error.redes.1,deteccion.error.redes.2,deteccion.error.redes.3)+5), main = "Detección del ERROR - Redes Neuronales", xlab = "Número de iteración", ylab = "Error cometido")
+plot(deteccion.error.redes.1, col = "green", type = "b",  ylim = c(min(deteccion.error.redes.1,deteccion.error.redes.2,deteccion.error.redes.3)-5, max(deteccion.error.redes.1,deteccion.error.redes.2,deteccion.error.redes.3)+5), main = "DetecciÃ³n del ERROR - Redes Neuronales", xlab = "NÃºmero de iteraciÃ³n", ylab = "Error cometido")
 points(deteccion.error.redes.2, col = "blue", type = "b")
 points(deteccion.error.redes.3, col = "red", type = "b")
 legend("topright", legend = c("5","7","9"), col = c("green","blue","red"), lty = 1, lwd = 1)
 
-plot(deteccion.error.k.10, col = "green", type = "b",  ylim = c(min(deteccion.error.k.10,deteccion.error.k.25,deteccion.error.k.50)-5, max(deteccion.error.k.10,deteccion.error.k.25,deteccion.error.k.50)+5), main = "Detección del ERROR - K-vecinos", xlab = "Número de iteración", ylab = "Error cometido")
+plot(deteccion.error.k.10, col = "green", type = "b",  ylim = c(min(deteccion.error.k.10,deteccion.error.k.25,deteccion.error.k.50)-5, max(deteccion.error.k.10,deteccion.error.k.25,deteccion.error.k.50)+5), main = "DetecciÃ³n del ERROR - K-vecinos", xlab = "NÃºmero de iteraciÃ³n", ylab = "Error cometido")
 points(deteccion.error.k.25, col = "blue", type = "b")
 points(deteccion.error.k.50, col = "red", type = "b")
 legend("topright", legend = c("10","25","50"), col = c("green", 
     "blue","red"), lty = 1, lwd = 1)
 
-plot(deteccion.error.discrete, col = "green", type = "b",  ylim = c(min(deteccion.error.discrete, deteccion.error.real, deteccion.error.gentle), max(deteccion.error.discrete, deteccion.error.real, deteccion.error.gentle)+1), main = "Detección del ERROR - ada boosting", xlab = "Número de iteración", ylab = "ERROR Cometido")
+plot(deteccion.error.discrete, col = "green", type = "b",  ylim = c(min(deteccion.error.discrete, deteccion.error.real, deteccion.error.gentle), max(deteccion.error.discrete, deteccion.error.real, deteccion.error.gentle)+1), main = "DetecciÃ³n del ERROR - ada boosting", xlab = "NÃºmero de iteraciÃ³n", ylab = "ERROR Cometido")
 points(deteccion.error.real, col = "blue", type = "b")
 points(deteccion.error.gentle, col = "red", type = "b")
 
@@ -1419,7 +1419,7 @@ legend("topright", legend = c("Discrete","Real","Gentle"), col = c("green","blue
 
 ```
 
-Se va a usar el modelo de Bayes que dio un mejor resultado durante la calibración.
+Se va a usar el modelo de Bayes que dio un mejor resultado durante la calibraciÃ³n.
 ```{r, warning=FALSE}
 datos5 <- read.csv("SegurosNuevos500V2016VE.csv", header=TRUE, sep=";", dec=",")
 modelo.bayes <- naiveBayes(Fraude~.,data=datos4,laplace=0)
